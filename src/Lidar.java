@@ -2,6 +2,7 @@ import Structs.Line2D;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Lidar {
     enum Direction {
@@ -32,10 +33,10 @@ public class Lidar {
         double y = SimMath.inchesToPixels(chassis.pose[1]) + (double) Main.FIELD_SIZE / 2;
         double angle = chassis.pose[2];
         double length = SimMath.inchesToPixels(maxRange);
-        sensors[Direction.FRONT.ordinal()] = new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle), y + length * Math.sin(angle))); // front
-        sensors[Direction.LEFT.ordinal()] = new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle + Math.PI/2), y + length * Math.sin(angle + Math.PI/2))); // left
-        sensors[Direction.RIGHT.ordinal()] = new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle - Math.PI/2), y + length * Math.sin(angle - Math.PI/2))); // right
-        sensors[Direction.BACK.ordinal()] = new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle + Math.PI), y + length * Math.sin(angle + Math.PI))); // back
+        sensors[Direction.FRONT.ordinal()] =  new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle - Math.PI/2), y + length * Math.sin(angle - Math.PI/2)));
+        sensors[Direction.LEFT.ordinal()] = new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle + Math.PI), y + length * Math.sin(angle + Math.PI)));
+        sensors[Direction.RIGHT.ordinal()] = new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle), y + length * Math.sin(angle)));
+        sensors[Direction.BACK.ordinal()] = new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle + Math.PI/2), y + length * Math.sin(angle + Math.PI/2)));
         this.checkForIntersections(Main.field.walls);
     }
 
@@ -49,7 +50,7 @@ public class Lidar {
                     double dx = intersection.x - sensor.start.x;
                     double dy = intersection.y - sensor.start.y;
                     double distance = Math.hypot(dx, dy);
-                    if(distance < maxRange) {
+                    if(distance < SimMath.inchesToPixels(maxRange)) {
                         distFromWall[dir.ordinal()] = SimMath.pixelsToInches(distance);
                         foundIntersection[dir.ordinal()] = true;
                     }

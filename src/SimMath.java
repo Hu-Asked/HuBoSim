@@ -10,27 +10,28 @@ public class SimMath {
         return pixels*baseSize/fieldSize;
     }
 
-    public static Structs.Point getLineIntersection(Structs.Line2D line1, Structs.Line2D line2) {
-        double startX1 = line1.start.x;
-        double startY1 = line1.start.y;
-        double endX1 = line1.end.x;
-        double endY1 = line1.end.y;
-        double startX2 = line2.start.x;
-        double startY2 = line2.start.y;
-        double endX2 = line2.end.x;
-        double endY2 = line2.end.y;
 
-        double slope1 = (endY1 - startY1) / (endX1 - startX1);
-        double slope2 = (endY2 - startY2) / (endX2 - startX2);
-        if(slope1 == slope2) {
+    public static Structs.Point getLineIntersection(Structs.Line2D line1, Structs.Line2D line2) {
+        double x1 = line1.start.x, y1 = line1.start.y;
+        double x2 = line1.end.x, y2 = line1.end.y;
+        double x3 = line2.start.x, y3 = line2.start.y;
+        double x4 = line2.end.x, y4 = line2.end.y;
+
+        double dn = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (Math.abs(dn) < 1e-8) return null; // Lines are parallel
+
+        double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / dn;
+        double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / dn;
+
+        // Check if intersection is within both segments
+        if (px < Math.min(x1, x2) - 1e-8 || px > Math.max(x1, x2) + 1e-8 ||
+                px < Math.min(x3, x4) - 1e-8 || px > Math.max(x3, x4) + 1e-8 ||
+                py < Math.min(y1, y2) - 1e-8 || py > Math.max(y1, y2) + 1e-8 ||
+                py < Math.min(y3, y4) - 1e-8 || py > Math.max(y3, y4) + 1e-8) {
             return null;
         }
-        double b1 = startY1 - slope1*startX1;
-        double b2 = startY2 - slope2*startX2;
 
-        double ix = (b2-b1)/(slope1-slope2);
-        double iy = slope1*ix + b1;
-
-        return new Structs.Point(ix, iy);
+        return new Structs.Point(px, py);
     }
+
 }

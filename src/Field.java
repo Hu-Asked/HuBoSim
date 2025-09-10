@@ -137,7 +137,7 @@ public class Field extends JPanel {
                 String.format("Segment: %d . Scalar: %.2f . Progress: %.2f%%", pp.pathSegIndex, pp.pathSegmentScalarProgression, pp.pathFollowPercentage),
                 debugX, debugY + 80);
         g2d.drawString(
-                String.format("Left: %.2f | Right: %.2f | Front: %.2f | Back: %.2f", Main.lidar.distFromWall[0], Main.lidar.distFromWall[1], Main.lidar.distFromWall[2], Main.lidar.distFromWall[3]),
+                String.format("Left: %.2f | Right: %.2f | Front: %.2f | Back: %.2f", Main.lidar.distFromWall[Lidar.Direction.LEFT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.RIGHT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.FRONT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.BACK.ordinal()]),
                 debugX, debugY + 100);
     }
     public void drawLookaheadCircle(Graphics g, double lookaheadDistance) {
