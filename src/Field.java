@@ -40,10 +40,11 @@ public class Field extends JPanel {
         Rectangle2D rect = new Rectangle2D.Double(0, 0, WIDTH, HEIGHT);
         g2d.fill(rect);
         drawField(g);
-        drawPath(g, Main.chosenPath, Color.BLUE);
+        drawPath(g, Main.chosenPath, Color.CYAN);
         drawPath(g, pp.actualPath, Color.GREEN);
         drawLookaheadCircle(g, pp.lookaheadDistance);
         Main.lidar.drawSensorLines(g);
+        Main.mcl.drawParticles(g, 6);
         chassis.render((Graphics2D) g);
     }
     // Updated method that accepts a Graphics parameter

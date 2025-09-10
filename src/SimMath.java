@@ -1,6 +1,9 @@
+import java.util.Random;
+
 public class SimMath {
     private static final double fieldSize = Main.FIELD_SIZE;
     private static final double baseSize = 140;
+    public static Random rd = new Random();
 
     public static double inchesToPixels(double inches) {
         return fieldSize/baseSize*inches;
@@ -32,6 +35,10 @@ public class SimMath {
         }
 
         return new Structs.Point(px, py);
+    }
+
+    public static double randomGaussian() {
+        return rd.nextGaussian();
     }
 
 }
