@@ -45,7 +45,7 @@ public class Field extends JPanel {
         drawLookaheadCircle(g, pp.lookaheadDistance);
         Main.lidar.drawSensorLines(g);
         Main.mcl.drawParticles(g, 6);
-        chassis.render((Graphics2D) g);
+        chassis.render(g);
     }
     // Updated method that accepts a Graphics parameter
     public void drawPath(Graphics g, ArrayList<Map.Entry<Structs.Point, Double>> path, Color color) {
@@ -72,19 +72,19 @@ public class Field extends JPanel {
         repaint();
     }
     private void constrainChassis() {
-        double[] pose = chassis.pose;
+        Structs.Pose pose = chassis.pose;
         double halfWidth = SimMath.pixelsToInches(chassis.width) / 2;
         double halfLength = SimMath.pixelsToInches(chassis.length) / 2;
-        if(pose[0] - halfWidth < - 70) {
-            pose[0] = -70 + halfWidth;
-        } else if(pose[0] + halfWidth > 70) {
-            pose[0] = 70 - halfWidth;
+        if(pose.x - halfWidth < - 70) {
+            pose.x = -70 + halfWidth;
+        } else if(pose.x + halfWidth > 70) {
+            pose.x = 70 - halfWidth;
         }
 
-        if(pose[1] - halfLength < -70) {
-            pose[1] = -70 + halfLength;
-        } else if(pose[1] + halfLength > 70) {
-            pose[1] = 70 - halfLength;
+        if(pose.y - halfLength < -70) {
+            pose.y = -70 + halfLength;
+        } else if(pose.y + halfLength > 70) {
+            pose.y = 70 - halfLength;
         }
 
     }
@@ -110,8 +110,9 @@ public class Field extends JPanel {
                 (int)(dotRadius * 2)
             );
         }
-        double robotX = inchesToScreenX(chassis.pose[0]);
-        double robotY = inchesToScreenY(-chassis.pose[1]);
+        Structs.Pose robPose = SimMath.cartesianToPixels(chassis.pose);
+        double robotX = inchesToScreenX(chassis.pose.x);
+        double robotY = inchesToScreenY(chassis.pose.y);
         double robotDotRadius = 8;
         g2d.setColor(Color.BLUE);
         g2d.fillOval(
@@ -126,7 +127,7 @@ public class Field extends JPanel {
                 debugX, debugY
         );
         g2d.drawString(
-                String.format("Pose: (%.2f, %.2f, %.2f)", chassis.pose[0], -chassis.pose[1], chassis.pose[2] * 180/Math.PI),
+                String.format("Pose: (%.2f, %.2f, %.2f)", chassis.pose.x, chassis.pose.y, chassis.pose.heading * 180/Math.PI),
                 debugX, debugY + 20);
         g2d.drawString(
                 String.format("PP Pose: (%.2f, %.2f, %.2f)", pp.currentPose.x, pp.currentPose.y, pp.currentPose.heading * 180/Math.PI),
@@ -150,8 +151,9 @@ public class Field extends JPanel {
         double radiusPixels = SimMath.inchesToPixels(lookaheadDistance);
 
         // Center the circle on the robot's position
-        double centerX = inchesToScreenX(chassis.pose[0]);
-        double centerY = inchesToScreenY(-chassis.pose[1]);
+        Structs.Pose center = SimMath.cartesianToPixels(chassis.pose);
+        double centerX = center.x;
+        double centerY = center.y;
 
         // Draw the circle
         g2d.drawOval(
@@ -162,13 +164,11 @@ public class Field extends JPanel {
         );
     }
 
-    // Helper methods needed for coordinate conversion
-    private double inchesToScreenX(double inches) {
+    public double inchesToScreenX(double inches) {
         return SimMath.inchesToPixels(inches) + WIDTH/2;
     }
 
-    private double inchesToScreenY(double inches) {
-        // Flip Y-axis so positive Y points upward
+    public double inchesToScreenY(double inches) {
         return HEIGHT / 2 - SimMath.inchesToPixels(inches);
     }
 }

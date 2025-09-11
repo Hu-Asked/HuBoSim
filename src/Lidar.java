@@ -29,9 +29,10 @@ public class Lidar {
     }
 
     public void updateSensorLines() {
-        double x = SimMath.inchesToPixels(chassis.pose[0]) + (double) Main.FIELD_SIZE / 2;
-        double y = SimMath.inchesToPixels(chassis.pose[1]) + (double) Main.FIELD_SIZE / 2;
-        double angle = chassis.pose[2];
+        Structs.Pose pose = SimMath.cartesianToPixels(this.chassis.pose);
+        double x = pose.x;
+        double y = pose.y;
+        double angle = pose.heading;
         double length = SimMath.inchesToPixels(maxRange);
         sensors[Direction.FRONT.ordinal()] =  new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle - Math.PI/2), y + length * Math.sin(angle - Math.PI/2)));
         sensors[Direction.LEFT.ordinal()] = new Line2D(new Structs.Point(x, y), new Structs.Point(x + length * Math.cos(angle + Math.PI), y + length * Math.sin(angle + Math.PI)));

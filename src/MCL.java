@@ -20,26 +20,32 @@ public class MCL {
         this.lidar = lidar;
         this.chassis = chassis;
         this.particles = new ArrayList<>();
-        this.prevPose = new Pose(chassis.pose[0], chassis.pose[1], chassis.pose[2]);
+        this.prevPose = chassis.pose;
         this.currPose = prevPose;
         initializeParticles();
     }
 
+    private Structs.Pose redistField() {
+        double FIELD_SIZE = Main.FIELD_SIZE;
+        double MARGIN = Main.field.MARGIN;
+        double x = Math.random() * (FIELD_SIZE - MARGIN) + MARGIN;
+        double y = Math.random() * (FIELD_SIZE - MARGIN) + MARGIN;
+        return SimMath.pixelsToCartesian(new Structs.Pose(x, y, Math.random() * 2 * Math.PI));
+    }
     private void initializeParticles() {
         for (int i = 0; i < numParticles; i++) {
-            double FIELD_SIZE = Main.FIELD_SIZE;
-            double MARGIN = Main.field.MARGIN;
-            double x = SimMath.pixelsToInches(Math.random() * (FIELD_SIZE - MARGIN) + MARGIN);
-            double y = SimMath.pixelsToInches(Math.random() * (FIELD_SIZE - MARGIN) + MARGIN);
-            particles.add(new Structs.Pose(x, y, Math.random() * 2 * Math.PI));
+            particles.add(redistField());
+            System.out.println(particles.get(i).x + ", " + particles.get(i).y + ", " + particles.get(i).heading * 180/Math.PI);
         }
     }
 
     public void drawParticles(Graphics g, int radius) {
+        boolean ded = false;
         for (Structs.Pose p : particles) {
+            Structs.Pose pixelPose = SimMath.cartesianToPixels(p);
             g.setColor(Color.BLUE);
-            int px = (int) SimMath.inchesToPixels(p.x);
-            int py = (int) SimMath.inchesToPixels(p.y);
+            int px = (int) pixelPose.x;
+            int py = (int) pixelPose.y;
             g.fillOval(px - radius / 2, py - radius / 2, radius, radius);
             //draw line representing heading
             g.setColor(Color.BLACK);
@@ -50,11 +56,11 @@ public class MCL {
     }
 
     public void update() {
-        this.prevPose = currPose;
-        this.currPose = new Pose(chassis.pose[0], chassis.pose[1], chassis.pose[2]);
+        this.prevPose = this.currPose;
+        this.currPose = new Structs.Pose(this.chassis.pose.x, this.chassis.pose.y, this.chassis.pose.heading);
         this.updateX = this.currPose.x - this.prevPose.x;
         this.updateY = this.currPose.y - this.prevPose.y;
-        this.updateTheta = currPose.heading - prevPose.heading;
+        this.updateTheta = this.currPose.heading - this.prevPose.heading;
         updateParticles();
     }
 
@@ -62,21 +68,27 @@ public class MCL {
         double moveDirection = Math.atan2(updateY, updateX);
         double distance = Math.hypot(updateX, updateY);
         for (Structs.Pose particle : particles) {
-            double dth = updateTheta * (1.0 + SimMath.randomGaussian() / 100.0);
+            double dth = updateTheta;
             particle.heading += dth;
-            double noisyDistance = distance * (1.0 + SimMath.randomGaussian() / 100.0);
+            double noisyDistance = distance;
             double headingDelta = moveDirection - prevPose.heading;
             particle.x += noisyDistance * Math.cos(particle.heading + headingDelta);
             particle.y += noisyDistance * Math.sin(particle.heading + headingDelta);
+//            if (isOutOfBounds(particle)) {
+//                Structs.Pose newPose = redistField();
+//                particle.x = newPose.x;
+//                particle.y = newPose.y;
+//                particle.heading = newPose.heading;
+//            }
         }
     }
 
     private boolean isOutOfBounds(Structs.Pose p) {
         double FIELD_SIZE = Main.FIELD_SIZE;
         double MARGIN = Main.field.MARGIN;
-        return p.x < SimMath.pixelsToInches(MARGIN) || p.x > SimMath.pixelsToInches(FIELD_SIZE - MARGIN) ||
-               p.y < SimMath.pixelsToInches(MARGIN) || p.y > SimMath.pixelsToInches(FIELD_SIZE - MARGIN);
+        return (p.x > -70 && p.x < 70 && p.y > -70 && p.y < 70);
     }
+
     private void resampleParticles() {
 
     }

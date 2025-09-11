@@ -1,3 +1,5 @@
+import Structs.Pose;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -14,9 +16,9 @@ public class Chassis {
 
     private static final double HEADINGOFFSET = Math.PI/2;
 
-    public final double[] pose;
+    public Structs.Pose pose;
 
-    public Chassis(int w, int l, double tc, double[] pose) {
+    public Chassis(int w, int l, double tc, Structs.Pose pose) {
         this.width = SimMath.inchesToPixels(w);
         this.length = SimMath.inchesToPixels(l);
         this.turnConstant = tc;
@@ -28,10 +30,10 @@ public class Chassis {
     }
 
     public void update() {
-        pose[0] += lateralVelocity * Math.cos(pose[2] - HEADINGOFFSET);
-        pose[1] += lateralVelocity * Math.sin(pose[2] - HEADINGOFFSET);
-        pose[2] += angularVelocity;
-        pose[2] %= 2 * Math.PI;
+        pose.x += lateralVelocity * -Math.cos(pose.heading + HEADINGOFFSET);
+        pose.y += lateralVelocity * Math.sin(pose.heading + HEADINGOFFSET);
+        pose.heading += angularVelocity;
+        pose.heading %= 2 * Math.PI;
     }
 
     public void leftDrive(double velocity) {
@@ -53,13 +55,14 @@ public class Chassis {
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(3.5f));
 
-        double x = SimMath.inchesToPixels(pose[0]) + (double) Main.FIELD_SIZE / 2;
-        double y = SimMath.inchesToPixels(pose[1]) + (double) Main.FIELD_SIZE / 2;
+        Structs.Pose newPose = SimMath.cartesianToPixels(pose);
+        double x = newPose.x;
+        double y = newPose.y;
 
         AffineTransform old = g2d.getTransform();
 
         g2d.translate(x, y);
-        g2d.rotate(pose[2]);
+        g2d.rotate(pose.heading);
         g2d.translate(-x, -y);
 
         Rectangle2D rect = new Rectangle2D.Double(x - width / 2, y - length / 2, width, length);

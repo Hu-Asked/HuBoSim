@@ -17,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("HuBoSim");
-        Chassis chassis = new Chassis(10, 12, 3.5, new double[]{0, 0, 0});
+        Chassis chassis = new Chassis(10, 12, 3.5, new Pose(0, 0, 0));
         Controller master = new Controller();
         PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
         field = new Field(chassis, pp);
@@ -32,9 +32,9 @@ public class Main {
         frame.requestFocusInWindow();
         frame.setVisible(true);
         frame.setResizable(false);
-        chassis.pose[0] = chosenPath.getFirst().getKey().x;
-        chassis.pose[1] = -chosenPath.getFirst().getKey().y;
-        pp.currentPose = new Pose(chassis.pose[0], -chassis.pose[1], chassis.pose[2]);
+        chassis.pose.x = chosenPath.getFirst().getKey().x;
+        chassis.pose.y = chosenPath.getFirst().getKey().y;
+        pp.currentPose = chassis.pose;
         pp.initializePath(pp.getStrippedPath(chosenPath));
         try {
             while(!start) {
@@ -46,7 +46,7 @@ public class Main {
         while(true) {
             lidar.updateSensorLines();
             mcl.update();
-            pp.currentPose = new Pose(chassis.pose[0], -chassis.pose[1], chassis.pose[2]);
+            pp.currentPose = chassis.pose;
 //            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 2);
             field.updateField(); // approx 60 FPS
             try {

@@ -13,6 +13,14 @@ public class SimMath {
         return pixels*baseSize/fieldSize;
     }
 
+    public static Structs.Pose pixelsToCartesian(Structs.Pose pose) {
+        return new Structs.Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading);
+    }
+
+    public static Structs.Pose cartesianToPixels(Structs.Pose pose) {
+        return new Structs.Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading);
+    }
+
 
     public static Structs.Point getLineIntersection(Structs.Line2D line1, Structs.Line2D line2) {
         double x1 = line1.start.x, y1 = line1.start.y;
