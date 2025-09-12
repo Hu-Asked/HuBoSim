@@ -1,5 +1,3 @@
-import Structs.Pose;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -16,9 +14,9 @@ public class Chassis {
 
     private static final double HEADINGOFFSET = Math.PI/2;
 
-    public Structs.Pose pose;
+    public util.Pose pose;
 
-    public Chassis(int w, int l, double tc, Structs.Pose pose) {
+    public Chassis(int w, int l, double tc, util.Pose pose) {
         this.width = SimMath.inchesToPixels(w);
         this.length = SimMath.inchesToPixels(l);
         this.turnConstant = tc;
@@ -55,7 +53,7 @@ public class Chassis {
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(3.5f));
 
-        Structs.Pose newPose = SimMath.cartesianToPixels(pose);
+        util.Pose newPose = SimMath.cartesianToPixels(pose);
         double x = newPose.x;
         double y = newPose.y;
 

@@ -13,16 +13,15 @@ public class SimMath {
         return pixels*baseSize/fieldSize;
     }
 
-    public static Structs.Pose pixelsToCartesian(Structs.Pose pose) {
-        return new Structs.Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading);
+    public static util.Pose pixelsToCartesian(util.Pose pose) {
+        return new util.Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading);
     }
 
-    public static Structs.Pose cartesianToPixels(Structs.Pose pose) {
-        return new Structs.Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading);
+    public static util.Pose cartesianToPixels(util.Pose pose) {
+        return new util.Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading);
     }
 
-
-    public static Structs.Point getLineIntersection(Structs.Line2D line1, Structs.Line2D line2) {
+    public static util.Point getLineIntersection(util.Line2D line1, util.Line2D line2) {
         double x1 = line1.start.x, y1 = line1.start.y;
         double x2 = line1.end.x, y2 = line1.end.y;
         double x3 = line2.start.x, y3 = line2.start.y;
@@ -42,11 +41,11 @@ public class SimMath {
             return null;
         }
 
-        return new Structs.Point(px, py);
+        return new util.Point(px, py);
     }
 
-    public static double randomGaussian() {
-        return rd.nextGaussian();
+    public static double getGaussianError(double errorMarginPct) {
+        return 1 + rd.nextGaussian() * errorMarginPct / 100.0;
     }
 
 }

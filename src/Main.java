@@ -1,18 +1,16 @@
-import Structs.Point;
-import Structs.Pose;
+import util.Pose;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.AbstractMap.SimpleEntry;
 
 public class Main {
     static Field field;
     static Lidar lidar;
     static MCL mcl;
     public static final int FIELD_SIZE = 880;
-    public static ArrayList<Map.Entry<Structs.Point, Double>> chosenPath = PPPaths.simplePath;
+    public static ArrayList<Map.Entry<util.Point, Double>> chosenPath = PPPaths.samplePath;
     public static boolean start = false;
 
     public static void main(String[] args) {
@@ -47,7 +45,7 @@ public class Main {
             lidar.updateSensorLines();
             mcl.update();
             pp.currentPose = chassis.pose;
-//            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 2);
+            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 2);
             field.updateField(); // approx 60 FPS
             try {
                 Thread.sleep(16);

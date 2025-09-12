@@ -1,6 +1,6 @@
-import Structs.Line2D;
-import Structs.Point;
-import Structs.Pose;
+import util.Line2D;
+import util.Point;
+import util.Pose;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -23,8 +23,8 @@ public class PurePursuit {
 
     public boolean exit = false;
 
-    public Structs.Point targetPoint = new Structs.Point(0,0);
-    public ArrayList<Map.Entry<Structs.Point, Double>> actualPath = new ArrayList<>();
+    public util.Point targetPoint = new util.Point(0,0);
+    public ArrayList<Map.Entry<util.Point, Double>> actualPath = new ArrayList<>();
 
     public PurePursuit(Chassis chassis, double kPt, double kPd, double trackWidth) {
         this.chassis = chassis;

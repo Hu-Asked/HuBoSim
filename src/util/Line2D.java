@@ -1,4 +1,4 @@
-package Structs;
+package util;
 
 public class Line2D {
     public Point start;

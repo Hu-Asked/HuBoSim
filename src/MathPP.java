@@ -1,8 +1,7 @@
-import Structs.Line2D;
-import Structs.Point;
-import Structs.Pose;
+import util.Line2D;
+import util.Point;
+import util.Pose;
 
-import javax.sound.sampled.Line;
 import java.util.ArrayList;
 import java.util.Map;
 

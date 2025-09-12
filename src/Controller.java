@@ -32,7 +32,6 @@ public class Controller implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        return;
     }
 
     @Override

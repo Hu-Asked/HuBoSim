@@ -1,4 +1,4 @@
-package Structs;
+package util;
 
 public class Pose {
     public double x;
