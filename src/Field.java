@@ -160,6 +160,10 @@ public class Field extends JPanel {
         g2d.drawString(
                 String.format("MCL Pose: (%.2f, %.2f, %.2f)", Main.mcl.estimatedPose.x, Main.mcl.estimatedPose.y, Main.mcl.estimatedPose.heading * 180/Math.PI),
                 debugX, debugY + 140);
+        g2d.drawString(
+                String.format("Expected Distances: L: %.2f | R: %.2f | F: %.2f | B: %.2f", Main.expectedDist[3], Main.expectedDist[1], Main.expectedDist[0], Main.expectedDist[2]),
+                debugX, debugY + 160
+        );
     }
     public void drawLookaheadCircle(Graphics g, double lookaheadDistance) {
         Graphics2D g2d = (Graphics2D) g;

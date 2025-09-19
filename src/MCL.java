@@ -1,4 +1,3 @@
-import jdk.jshell.execution.Util;
 import util.Pose;
 
 import java.awt.*;
@@ -16,12 +15,14 @@ public class MCL {
     private double minDistTravel = 1;
     private double distSinceLastUpdate = 0;
     private double totalWeight = 0;
+    private double expectedReadingOffsetLat = 0;
+    private double expectedReadingOffsetSides = 0;
     private Pose prevPose;
     private Pose currPose;
     public util.Pose estimatedPose;
     public ArrayList<double[]> particleDistFromWalls;
 
-    public MCL(int numParticles, double minDistTravel, Lidar lidar, Chassis chassis) {
+    public MCL(int numParticles, double minDistTravel, double expectedReadingOffsetLat, double expecctedReadingOffsetSides, Lidar lidar, Chassis chassis) {
         this.numParticles = numParticles;
         this.minDistTravel = minDistTravel;
         this.lidar = lidar;
@@ -30,12 +31,14 @@ public class MCL {
         this.weights = new ArrayList<>();
         this.prevPose = chassis.pose;
         this.currPose = prevPose;
+        this.expectedReadingOffsetLat = expectedReadingOffsetLat;
+        this.expectedReadingOffsetSides = expecctedReadingOffsetSides;
         this.estimatedPose = new util.Pose(chassis.pose.x, chassis.pose.y, chassis.pose.heading);
         this.particleDistFromWalls = new ArrayList<>();
         initializeParticles();
     }
 
-    private util.Pose redistField() {
+    private util.Pose redistributeParticle() {
         double FIELD_SIZE = Main.FIELD_SIZE;
         double MARGIN = Main.field.MARGIN;
         double x = Math.random() * (FIELD_SIZE - MARGIN) + MARGIN;
@@ -45,7 +48,7 @@ public class MCL {
     private void initializeParticles() {
         for (int i = 0; i < numParticles; i++) {
             particleDistFromWalls.add(new double[4]);
-            particles.add(redistField());
+            particles.add(redistributeParticle());
             weights.add(1.0);
             totalWeight += 1.0;
         }
@@ -100,7 +103,7 @@ public class MCL {
             avgY += particle.y;
             avgTheta += particle.heading;
             if (isOutOfBounds(particle)) {
-                util.Pose newPose = redistField();
+                util.Pose newPose = redistributeParticle();
                 particle.x = newPose.x;
                 particle.y = newPose.y;
                 particle.heading = newPose.heading;
@@ -114,7 +117,8 @@ public class MCL {
     private boolean isOutOfBounds(util.Pose p) {
         return !(p.x > -67 && p.x < 67 && p.y > -67 && p.y < 67);
     }
-    private double getExpectedReading(util.Pose p, Lidar.Direction sensorDir) {
+    public double getExpectedReading(util.Pose p, Lidar.Direction sensorDir) {
+        double sensorHeading = MathPP.angleWrap(p.heading + sensorDir.ordinal() * Math.PI / 2, true);
         int wall = lidar.detectedWall[sensorDir.ordinal()];
         if (wall == -1) return -1;
         double relativeHeading = 0;
@@ -122,21 +126,27 @@ public class MCL {
         switch (wall) {
             case 0 -> {
                 offsetFromWall = 70 - p.y;
-                relativeHeading = MathPP.angleWrap(p.heading, true);
+                relativeHeading = MathPP.angleWrap(sensorHeading, true);
             }
             case 1 -> {
-                offsetFromWall = 70 + p.x;
-                relativeHeading = MathPP.angleWrap(3*Math.PI/2 - p.heading, true);
+                offsetFromWall = 70 - p.x;
+                relativeHeading = MathPP.angleWrap(Math.PI/2 - sensorHeading, true);
             }
             case 2 -> {
-                offsetFromWall = 70 - p.x;
-                relativeHeading = MathPP.angleWrap(Math.PI/2 - p.heading, true);
+                offsetFromWall = 70 + p.y;
+                relativeHeading = MathPP.angleWrap(Math.PI - sensorHeading, true);
             }
             case 3 -> {
-                offsetFromWall = 70 + p.y;
-                relativeHeading = MathPP.angleWrap(Math.PI - p.heading, true);
+                offsetFromWall = 70 + p.x;
+                relativeHeading = MathPP.angleWrap(3*Math.PI/2 - sensorHeading, true);
             }
         }
-        return offsetFromWall / Math.cos(relativeHeading);
+        double res = offsetFromWall + relativeHeading;
+        if (sensorDir == Lidar.Direction.FRONT || sensorDir == Lidar.Direction.BACK) {
+            res += expectedReadingOffsetLat;
+        } else {
+            res += expectedReadingOffsetSides;
+        }
+        return res;
     }
 }
