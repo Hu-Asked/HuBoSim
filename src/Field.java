@@ -96,7 +96,7 @@ public class Field extends JPanel {
             Line2D nLine = new Line2D.Double(line.start.x, line.start.y, line.end.x, line.end.y);
             g2d.draw(nLine);
         }
-        if (pp != null && pp.targetPoint != null) {
+        if (pp != null && pp.targetPoint != null && Main.chosenPath != null && !Main.chosenPath.isEmpty()) {
             util.Point target = pp.targetPoint;
             double dotRadius = 10; // Adjust for desired size
             double centerX = inchesToScreenX(target.x);
@@ -107,6 +107,20 @@ public class Field extends JPanel {
                 (int)(centerY - dotRadius),
                 (int)(dotRadius * 2),
                 (int)(dotRadius * 2)
+            );
+            g2d.setColor(Color.ORANGE);
+            util.Point speedPoint = new util.Point(
+                    Main.chosenPath.get(Math.min(pp.indexOfSpeed, Main.chosenPath.size() - 1)).getKey().x,
+                    Main.chosenPath.get(Math.min(pp.indexOfSpeed, Main.chosenPath.size() - 1)).getKey().y
+            );
+
+            centerX = inchesToScreenX(speedPoint.x);
+            centerY = inchesToScreenY(speedPoint.y);
+            g2d.fillOval(
+                    (int)(centerX - dotRadius / 2),
+                    (int)(centerY - dotRadius / 2),
+                    (int)(dotRadius*2),
+                    (int)(dotRadius*2)
             );
         }
         util.Pose robPose = SimMath.cartesianToPixels(chassis.pose);
@@ -140,6 +154,12 @@ public class Field extends JPanel {
         g2d.drawString(
                 String.format("Left: %.2f | Right: %.2f | Front: %.2f | Back: %.2f", Main.lidar.distFromWall[Lidar.Direction.LEFT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.RIGHT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.FRONT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.BACK.ordinal()]),
                 debugX, debugY + 100);
+        g2d.drawString(
+                String.format("Left: %d | Right: %d | Front: %d | Back: %d", Main.lidar.detectedWall[Lidar.Direction.LEFT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.RIGHT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.FRONT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.BACK.ordinal()]),
+                debugX, debugY + 120);
+        g2d.drawString(
+                String.format("MCL Pose: (%.2f, %.2f, %.2f)", Main.mcl.estimatedPose.x, Main.mcl.estimatedPose.y, Main.mcl.estimatedPose.heading * 180/Math.PI),
+                debugX, debugY + 140);
     }
     public void drawLookaheadCircle(Graphics g, double lookaheadDistance) {
         Graphics2D g2d = (Graphics2D) g;

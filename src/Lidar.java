@@ -52,7 +52,7 @@ public class Lidar {
                     double dy = intersection.y - sensor.start.y;
                     double distance = Math.hypot(dx, dy);
                     if(distance < SimMath.inchesToPixels(maxRange)) {
-                        distFromWall[dir.ordinal()] = SimMath.pixelsToInches(distance) * SimMath.getGaussianError(1.0);
+                        distFromWall[dir.ordinal()] = SimMath.pixelsToInches(distance) + SimMath.getGaussianError(1.0);
                         detectedWall[dir.ordinal()] = Arrays.asList(walls).indexOf(wall);
                         foundIntersection[dir.ordinal()] = true;
                     }

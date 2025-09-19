@@ -17,6 +17,7 @@ public class PurePursuit {
     public double pathSegmentScalarProgression = 0;
     public double pathFollowPercentage = 0;
     public double lookaheadDistance = 10;
+    public int indexOfSpeed = 0;
 
     public double rHeading = 0;
     public double aHeading = 0;
@@ -139,7 +140,7 @@ public class PurePursuit {
         }
         return strippedPath;
     }
-    public void followPath(final ArrayList<Map.Entry<Point, Double>> unprocessedPath, double lookaheadDistance, double maxSpeed, double distBetweenSegments) {
+    public void followPath(final ArrayList<Map.Entry<Point, Double>> unprocessedPath, double lookaheadDistance, double maxSpeed, int segOffset) {
         this.lookaheadDistance = lookaheadDistance;
         ArrayList<Line2D> strippedPath  = getStrippedPath(unprocessedPath);
 
@@ -151,7 +152,8 @@ public class PurePursuit {
             return;
         }
         actualPath.add(new AbstractMap.SimpleEntry<>(new Point(currentPose.x, currentPose.y), 0.0));
-        double speedMultiplier = unprocessedPath.get(Math.max(0, (int) (pathSegIndex - (lookaheadDistance / distBetweenSegments)))).getValue();
+        indexOfSpeed = (pathSegIndex - segOffset);
+        double speedMultiplier = unprocessedPath.get(Math.max(0, indexOfSpeed)).getValue();
         goToPosition(target, maxSpeed * speedMultiplier/100);
         updateSegmentProgression(strippedPath);
 

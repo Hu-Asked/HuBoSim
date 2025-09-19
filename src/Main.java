@@ -20,7 +20,7 @@ public class Main {
         PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
         field = new Field(chassis, pp);
         lidar = new Lidar(50, chassis);
-        mcl = new MCL(500, lidar, chassis);
+        mcl = new MCL(500, 0.3, lidar, chassis);
         field.setPreferredSize(new Dimension((int) field.WIDTH, (int) field.HEIGHT));
         frame.add(field);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,7 +45,7 @@ public class Main {
             lidar.updateSensorLines();
             mcl.update();
             pp.currentPose = chassis.pose;
-            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 2);
+//            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 4);
             field.updateField(); // approx 60 FPS
             try {
                 Thread.sleep(16);

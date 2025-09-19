@@ -13,16 +13,25 @@ public class MCL {
     public double updateY;
     public double updateTheta;
     private int numParticles;
+    private double minDistTravel = 1;
+    private double distSinceLastUpdate = 0;
+    private double totalWeight = 0;
     private Pose prevPose;
     private Pose currPose;
+    public util.Pose estimatedPose;
+    public ArrayList<double[]> particleDistFromWalls;
 
-    public MCL(int numParticles, Lidar lidar, Chassis chassis) {
+    public MCL(int numParticles, double minDistTravel, Lidar lidar, Chassis chassis) {
         this.numParticles = numParticles;
+        this.minDistTravel = minDistTravel;
         this.lidar = lidar;
         this.chassis = chassis;
         this.particles = new ArrayList<>();
+        this.weights = new ArrayList<>();
         this.prevPose = chassis.pose;
         this.currPose = prevPose;
+        this.estimatedPose = new util.Pose(chassis.pose.x, chassis.pose.y, chassis.pose.heading);
+        this.particleDistFromWalls = new ArrayList<>();
         initializeParticles();
     }
 
@@ -35,22 +44,28 @@ public class MCL {
     }
     private void initializeParticles() {
         for (int i = 0; i < numParticles; i++) {
+            particleDistFromWalls.add(new double[4]);
             particles.add(redistField());
+            weights.add(1.0);
+            totalWeight += 1.0;
         }
     }
 
     public void drawParticles(Graphics g, int radius) {
-        boolean ded = false;
         for (util.Pose p : particles) {
             util.Pose pixelPose = SimMath.cartesianToPixels(p);
             g.setColor(Color.BLUE);
             int px = (int) pixelPose.x;
             int py = (int) pixelPose.y;
-            g.fillOval(px - radius / 2, py - radius / 2, radius, radius);
+            //make radius proportional to weight
+            int newRadius = radius;
+//            int newRadius = (int) (radius * (weighParticle(p) / (totalWeight / numParticles)));
+//            if (newRadius < 2) newRadius = 2;
+            g.fillOval(px - newRadius / 2, py - newRadius / 2, newRadius, newRadius);
             //draw line representing heading
             g.setColor(Color.BLACK);
-            int hx = (int) (px + radius * Math.cos(p.heading - Math.PI / 2));
-            int hy = (int) (py + radius * Math.sin(p.heading - Math.PI / 2));
+            int hx = (int) (px + newRadius * Math.cos(p.heading - Math.PI / 2));
+            int hy = (int) (py + newRadius * Math.sin(p.heading - Math.PI / 2));
             g.drawLine(px, py, hx, hy);
         }
     }
@@ -65,16 +80,25 @@ public class MCL {
     }
 
     private void updateParticles() {
-        double moveDirection = Math.atan2(updateY, updateX);
         double distance = Math.hypot(updateX, updateY);
+        distSinceLastUpdate += distance;
         boolean isReversing = (chassis.leftVelocity < 0 || chassis.rightVelocity < 0);
         if (isReversing) distance *= -1;
-        for (util.Pose particle : particles) {
+        this.totalWeight = 0;
+        double avgX = 0;
+        double avgY = 0;
+        double avgTheta = 0;
+        for (int i = 0; i < numParticles; i++) {
+            util.Pose particle = particles.get(i);
             double dth = updateTheta;
             particle.heading += dth;
-            double noisyDistance = distance * SimMath.getGaussianError(1.0);
+
+            double noisyDistance = distance + SimMath.getGaussianError(2.0);
             particle.x += noisyDistance * -Math.cos(particle.heading + Math.PI/2);
             particle.y += noisyDistance * Math.sin(particle.heading + Math.PI/2);
+            avgX += particle.x;
+            avgY += particle.y;
+            avgTheta += particle.heading;
             if (isOutOfBounds(particle)) {
                 util.Pose newPose = redistField();
                 particle.x = newPose.x;
@@ -82,51 +106,37 @@ public class MCL {
                 particle.heading = newPose.heading;
             }
         }
+        avgY = avgY / numParticles;
+        avgX = avgX / numParticles;
+        avgTheta = avgTheta / numParticles;
     }
 
     private boolean isOutOfBounds(util.Pose p) {
         return !(p.x > -67 && p.x < 67 && p.y > -67 && p.y < 67);
     }
-
     private double getExpectedReading(util.Pose p, Lidar.Direction sensorDir) {
         int wall = lidar.detectedWall[sensorDir.ordinal()];
         if (wall == -1) return -1;
         double relativeHeading = 0;
         double offsetFromWall = 0;
         switch (wall) {
-            case 1 -> {
+            case 0 -> {
                 offsetFromWall = 70 - p.y;
-                relativeHeading = p.heading;
+                relativeHeading = MathPP.angleWrap(p.heading, true);
+            }
+            case 1 -> {
+                offsetFromWall = 70 + p.x;
+                relativeHeading = MathPP.angleWrap(3*Math.PI/2 - p.heading, true);
             }
             case 2 -> {
-                offsetFromWall = -70 + p.x;
-                relativeHeading = p.heading - 3*Math.PI/2;
+                offsetFromWall = 70 - p.x;
+                relativeHeading = MathPP.angleWrap(Math.PI/2 - p.heading, true);
             }
             case 3 -> {
-                offsetFromWall = 70 - p.x;
-                relativeHeading = p.heading - Math.PI/2;
-            }
-            case 4 -> {
-                offsetFromWall = -70 + p.y;
-                relativeHeading = p.heading - Math.PI;
+                offsetFromWall = 70 + p.y;
+                relativeHeading = MathPP.angleWrap(Math.PI - p.heading, true);
             }
         }
-        return offsetFromWall / Math.cos(relativeHeading + Math.PI/2);
+        return offsetFromWall / Math.cos(relativeHeading);
     }
-    private boolean weighParticle(util.Pose particle) {
-        double weight = 1.0;
-        double[] lidarReadings = lidar.distFromWall;
-        for(int i = 0; i < lidarReadings.length; i++) {
-            double expected = getExpectedReading(particle, Lidar.Direction.values()[i]);
-            double actual = lidarReadings[i];
-            if(actual < 0 || expected < 0) continue;
-            double diff = actual - expected;
-
-        }
-    }
-
-    private void resampleParticles() {
-
-    }
-
 }

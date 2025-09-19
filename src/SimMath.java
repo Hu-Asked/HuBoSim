@@ -45,7 +45,7 @@ public class SimMath {
     }
 
     public static double getGaussianError(double errorMarginPct) {
-        return 1 + rd.nextGaussian() * errorMarginPct / 100.0;
+        return rd.nextGaussian() * (errorMarginPct / 100.0);
     }
 
 }
