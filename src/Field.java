@@ -19,9 +19,9 @@ public class Field extends JPanel {
 
     public final util.Line2D[] walls = {
             new util.Line2D(new util.Point(corners[0][0], corners[0][1]), new util.Point(corners[1][0], corners[1][1])), // top wall
-            new util.Line2D(new util.Point(corners[3][0], corners[3][1]), new util.Point(corners[0][0], corners[0][1])),  // left wall
             new util.Line2D(new util.Point(corners[1][0], corners[1][1]), new util.Point(corners[2][0], corners[2][1])), // right wall
-            new util.Line2D(new util.Point(corners[2][0], corners[2][1]), new util.Point(corners[3][0], corners[3][1])) // bottom wall
+            new util.Line2D(new util.Point(corners[2][0], corners[2][1]), new util.Point(corners[3][0], corners[3][1])), // bottom wall
+            new util.Line2D(new util.Point(corners[3][0], corners[3][1]), new util.Point(corners[0][0], corners[0][1]))  // left wall
     };
 
     public PurePursuit pp;

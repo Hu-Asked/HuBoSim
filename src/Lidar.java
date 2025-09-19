@@ -6,14 +6,14 @@ import java.util.Arrays;
 public class Lidar {
     enum Direction {
         FRONT,
-        LEFT,
         RIGHT,
-        BACK
+        BACK,
+        LEFT
     }
     Chassis chassis;
     double maxRange;
     Line2D[] sensors = new Line2D[4];
-    double[] distFromWall = new double[4]; // front, left, right, back
+    double[] distFromWall = new double[4]; // front, right, back, left
     int[] detectedWall = {-1, -1, -1, -1};
     public Lidar(double maxRange, Chassis chassis) {
         this.maxRange = maxRange;
@@ -35,9 +35,9 @@ public class Lidar {
         double angle = pose.heading;
         double length = SimMath.inchesToPixels(maxRange);
         sensors[Direction.FRONT.ordinal()] =  new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle - Math.PI/2), y + length * Math.sin(angle - Math.PI/2)));
-        sensors[Direction.LEFT.ordinal()] = new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle + Math.PI), y + length * Math.sin(angle + Math.PI)));
         sensors[Direction.RIGHT.ordinal()] = new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle), y + length * Math.sin(angle)));
         sensors[Direction.BACK.ordinal()] = new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle + Math.PI/2), y + length * Math.sin(angle + Math.PI/2)));
+        sensors[Direction.LEFT.ordinal()] = new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle + Math.PI), y + length * Math.sin(angle + Math.PI)));
         this.checkForIntersections(Main.field.walls);
     }
 
