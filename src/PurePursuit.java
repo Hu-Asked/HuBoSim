@@ -23,6 +23,7 @@ public class PurePursuit {
     public double aHeading = 0;
 
     public boolean exit = false;
+    public boolean release = false;
 
     public util.Point targetPoint = new util.Point(0,0);
     public ArrayList<Map.Entry<util.Point, Double>> actualPath = new ArrayList<>();
@@ -96,6 +97,7 @@ public class PurePursuit {
         this.pathSegmentScalarProgression = 0;
         this.pathSegIndex = 0;
         this.exit = false;
+        this.release = false;
 
         this.actualPath = new ArrayList<>();
 
@@ -132,6 +134,11 @@ public class PurePursuit {
         return false;
     }
 
+    public void waitUntil(double percentage) {
+        if(pathFollowPercentage > percentage) {
+            release = true;
+        }
+    }
     public ArrayList<Line2D> getStrippedPath(final ArrayList<Map.Entry<Point, Double>> unprocessedPath) {
         ArrayList<Line2D> strippedPath = new ArrayList<>();
         ArrayList<Map.Entry<Line2D, Double>> path = processPath(unprocessedPath);

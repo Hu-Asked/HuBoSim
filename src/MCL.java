@@ -4,10 +4,10 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class MCL {
-    private ArrayList<util.Pose> particles;
-    private ArrayList<Double> weights;
-    private Lidar lidar;
-    private Chassis chassis;
+    private final ArrayList<util.Pose> particles;
+    private final ArrayList<Double> weights;
+    private final Lidar lidar;
+    private final Chassis chassis;
     public double updateX;
     public double updateY;
     public double updateTheta;
@@ -20,7 +20,6 @@ public class MCL {
     private Pose prevPose;
     private Pose currPose;
     public util.Pose estimatedPose;
-    public ArrayList<double[]> particleDistFromWalls;
 
     public MCL(int numParticles, double minDistTravel, double expectedReadingOffsetLat, double expecctedReadingOffsetSides, Lidar lidar, Chassis chassis) {
         this.numParticles = numParticles;
@@ -34,7 +33,6 @@ public class MCL {
         this.expectedReadingOffsetLat = expectedReadingOffsetLat;
         this.expectedReadingOffsetSides = expecctedReadingOffsetSides;
         this.estimatedPose = new util.Pose(chassis.pose.x, chassis.pose.y, chassis.pose.heading);
-        this.particleDistFromWalls = new ArrayList<>();
         initializeParticles();
     }
 
@@ -47,7 +45,6 @@ public class MCL {
     }
     private void initializeParticles() {
         for (int i = 0; i < numParticles; i++) {
-            particleDistFromWalls.add(new double[4]);
             particles.add(redistributeParticle());
             weights.add(1.0);
             totalWeight += 1.0;
@@ -62,14 +59,17 @@ public class MCL {
             int py = (int) pixelPose.y;
             //make radius proportional to weight
             int newRadius = radius;
-//            int newRadius = (int) (radius * (weighParticle(p) / (totalWeight / numParticles)));
-//            if (newRadius < 2) newRadius = 2;
+//          int newRadius = (int) (radius * (weighParticle(p) / (totalWeight / numParticles)));
+//          if (newRadius < 2) newRadius = 2;
             g.fillOval(px - newRadius / 2, py - newRadius / 2, newRadius, newRadius);
             //draw line representing heading
             g.setColor(Color.BLACK);
             int hx = (int) (px + newRadius * Math.cos(p.heading - Math.PI / 2));
             int hy = (int) (py + newRadius * Math.sin(p.heading - Math.PI / 2));
             g.drawLine(px, py, hx, hy);
+
+            double weight = weights.get(particles.indexOf(p));
+            g.drawString(String.format("%.10f", weight), px + newRadius / 2, py + newRadius / 2);
         }
     }
 
@@ -108,16 +108,46 @@ public class MCL {
                 particle.y = newPose.y;
                 particle.heading = newPose.heading;
             }
+            double weight = weighParticle(particle);
+            weights.set(i, weight);
+            totalWeight += weight;
         }
+        normalizeWeights();
         avgY = avgY / numParticles;
         avgX = avgX / numParticles;
         avgTheta = avgTheta / numParticles;
     }
 
+    private double weighParticle(util.Pose p) {
+        double weight = 1.0;
+        for (Lidar.Direction dir : Lidar.Direction.values()) {
+            double lidarReading = lidar.distFromWall[dir.ordinal()];
+            double particleReading = getParticleReading(p, dir);
+            double error = lidarReading - particleReading;
+            error /= 1e5;
+            double sigma = 1.0;
+            double variance = sigma*sigma;
+            double gaussian = 1/(sigma*Math.sqrt(2*Math.PI));
+            gaussian *= Math.exp(-(error*error)/(2*variance));
+            weight *= gaussian;
+        }
+        return weight;
+    }
+
+    private void normalizeWeights() {
+        double sum = 0;
+        for (double w : weights) {
+            sum += w;
+        }
+        for (int i = 0; i < weights.size(); i++) {
+            weights.set(i, weights.get(i) / sum);
+        }
+    }
+
     private boolean isOutOfBounds(util.Pose p) {
         return !(p.x > -67 && p.x < 67 && p.y > -67 && p.y < 67);
     }
-    public double getExpectedReading(util.Pose p, Lidar.Direction sensorDir) {
+    public double getParticleReading(util.Pose p, Lidar.Direction sensorDir) {
         double sensorHeading = MathPP.angleWrap(p.heading + sensorDir.ordinal() * Math.PI / 2, true);
         int wall = lidar.detectedWall[sensorDir.ordinal()];
         if (wall == -1) return -1;

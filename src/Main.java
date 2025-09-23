@@ -21,7 +21,7 @@ public class Main {
         PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
         field = new Field(chassis, pp);
         lidar = new Lidar(50, chassis);
-        mcl = new MCL(500, 0.3, -3, -3, lidar, chassis);
+        mcl = new MCL(50, 0.3, -3, -3, lidar, chassis);
         field.setPreferredSize(new Dimension((int) field.WIDTH, (int) field.HEIGHT));
         frame.add(field);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,13 +45,19 @@ public class Main {
         while(true) {
             for (Lidar.Direction dir : Lidar.Direction.values()) {
                 int i = dir.ordinal();
-                expectedDist[i] = mcl.getExpectedReading(chassis.pose, dir);
+                expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);
             }
             lidar.updateSensorLines();
             mcl.update();
             pp.currentPose = chassis.pose;
 //            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 4);
-            field.updateField(); // approx 60 FPS
+//            pp.waitUntil(60);
+//            if(pp.release) {
+//                chosenPath = PPPaths.samplePath1;
+//                pp.initializePath(pp.getStrippedPath(chosenPath));
+//            }
+
+            field.updateField();
             try {
                 Thread.sleep(16);
             } catch (InterruptedException e) {

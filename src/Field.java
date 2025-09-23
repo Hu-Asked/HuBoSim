@@ -143,26 +143,23 @@ public class Field extends JPanel {
                 String.format("Pose: (%.2f, %.2f, %.2f)", chassis.pose.x, chassis.pose.y, chassis.pose.heading * 180/Math.PI),
                 debugX, debugY + 20);
         g2d.drawString(
-                String.format("PP Pose: (%.2f, %.2f, %.2f)", pp.currentPose.x, pp.currentPose.y, pp.currentPose.heading * 180/Math.PI),
+                String.format("Relative Heading: %.2f . Abs Heading: %.2f", pp.rHeading, pp.aHeading),
                 debugX, debugY + 40);
         g2d.drawString(
-                String.format("Relative Heading: %.2f . Abs Heading: %.2f", pp.rHeading, pp.aHeading),
+                String.format("Segment: %d . Scalar: %.2f . Progress: %.2f%%", pp.pathSegIndex, pp.pathSegmentScalarProgression, pp.pathFollowPercentage),
                 debugX, debugY + 60);
         g2d.drawString(
-                String.format("Segment: %d . Scalar: %.2f . Progress: %.2f%%", pp.pathSegIndex, pp.pathSegmentScalarProgression, pp.pathFollowPercentage),
+                String.format("Left: %.2f | Right: %.2f | Front: %.2f | Back: %.2f", Main.lidar.distFromWall[Lidar.Direction.LEFT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.RIGHT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.FRONT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.BACK.ordinal()]),
                 debugX, debugY + 80);
         g2d.drawString(
-                String.format("Left: %.2f | Right: %.2f | Front: %.2f | Back: %.2f", Main.lidar.distFromWall[Lidar.Direction.LEFT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.RIGHT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.FRONT.ordinal()], Main.lidar.distFromWall[Lidar.Direction.BACK.ordinal()]),
+                String.format("Left: %d | Right: %d | Front: %d | Back: %d", Main.lidar.detectedWall[Lidar.Direction.LEFT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.RIGHT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.FRONT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.BACK.ordinal()]),
                 debugX, debugY + 100);
         g2d.drawString(
-                String.format("Left: %d | Right: %d | Front: %d | Back: %d", Main.lidar.detectedWall[Lidar.Direction.LEFT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.RIGHT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.FRONT.ordinal()], Main.lidar.detectedWall[Lidar.Direction.BACK.ordinal()]),
+                String.format("MCL Pose: (%.2f, %.2f, %.2f)", Main.mcl.estimatedPose.x, Main.mcl.estimatedPose.y, Main.mcl.estimatedPose.heading * 180/Math.PI),
                 debugX, debugY + 120);
         g2d.drawString(
-                String.format("MCL Pose: (%.2f, %.2f, %.2f)", Main.mcl.estimatedPose.x, Main.mcl.estimatedPose.y, Main.mcl.estimatedPose.heading * 180/Math.PI),
-                debugX, debugY + 140);
-        g2d.drawString(
                 String.format("Expected Distances: L: %.2f | R: %.2f | F: %.2f | B: %.2f", Main.expectedDist[3], Main.expectedDist[1], Main.expectedDist[0], Main.expectedDist[2]),
-                debugX, debugY + 160
+                debugX, debugY + 140
         );
     }
     public void drawLookaheadCircle(Graphics g, double lookaheadDistance) {
