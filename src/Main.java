@@ -21,7 +21,7 @@ public class Main {
         PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
         field = new Field(chassis, pp);
         lidar = new Lidar(50, chassis);
-        mcl = new MCL(50, 0.3, -3, -3, lidar, chassis);
+        mcl = new MCL(1000, 0.01, -3, -3, lidar, chassis);
         field.setPreferredSize(new Dimension((int) field.WIDTH, (int) field.HEIGHT));
         frame.add(field);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

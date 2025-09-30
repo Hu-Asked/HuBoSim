@@ -57,7 +57,6 @@ public class MCL {
             g.setColor(Color.BLUE);
             int px = (int) pixelPose.x;
             int py = (int) pixelPose.y;
-            //make radius proportional to weight
             int newRadius = radius;
 //          int newRadius = (int) (radius * (weighParticle(p) / (totalWeight / numParticles)));
 //          if (newRadius < 2) newRadius = 2;
@@ -67,9 +66,6 @@ public class MCL {
             int hx = (int) (px + newRadius * Math.cos(p.heading - Math.PI / 2));
             int hy = (int) (py + newRadius * Math.sin(p.heading - Math.PI / 2));
             g.drawLine(px, py, hx, hy);
-
-            double weight = weights.get(particles.indexOf(p));
-            g.drawString(String.format("%.10f", weight), px + newRadius / 2, py + newRadius / 2);
         }
     }
 
@@ -108,30 +104,59 @@ public class MCL {
                 particle.y = newPose.y;
                 particle.heading = newPose.heading;
             }
+        }
+
+        for (int i = 0; i < numParticles; i++) {
+            util.Pose particle = particles.get(i);
             double weight = weighParticle(particle);
             weights.set(i, weight);
             totalWeight += weight;
+            avgX += particle.x * weight;
+            avgY += particle.y * weight;
+            avgTheta += particle.heading * weight;
         }
+
         normalizeWeights();
-        avgY = avgY / numParticles;
-        avgX = avgX / numParticles;
-        avgTheta = avgTheta / numParticles;
+        boolean shouldResample = distSinceLastUpdate >= minDistTravel &&
+                calculateEffectiveSampleSize() < numParticles * 0.5;
+        if (shouldResample) {
+            resampleParticles();
+            distSinceLastUpdate = 0;
+        }
+
+        this.estimatedPose = new Pose(avgX, avgY, avgTheta);
+    }
+
+    private double calculateEffectiveSampleSize() {
+        double sumSquared = 0;
+        for (double w : weights) {
+            sumSquared += w * w;
+        }
+        return 1.0 / sumSquared;
     }
 
     private double weighParticle(util.Pose p) {
-        double weight = 1.0;
+        double totalWeight = 1.0;
+        int validReadings = 0;
+
         for (Lidar.Direction dir : Lidar.Direction.values()) {
             double lidarReading = lidar.distFromWall[dir.ordinal()];
             double particleReading = getParticleReading(p, dir);
-            double error = lidarReading - particleReading;
-            error /= 1e5;
-            double sigma = 1.0;
-            double variance = sigma*sigma;
-            double gaussian = 1/(sigma*Math.sqrt(2*Math.PI));
-            gaussian *= Math.exp(-(error*error)/(2*variance));
-            weight *= gaussian;
+
+            if (lidarReading < 0 || particleReading < 0) continue;
+
+            double error = Math.abs(lidarReading - particleReading);
+
+            double sigma = 5.0;
+            double likelihood = 1.0 / (1.0 + (error * error) / (sigma * sigma));
+
+            totalWeight *= likelihood;
+            validReadings++;
         }
-        return weight;
+
+        if (validReadings == 0) return 1e-10;
+
+        return Math.max(totalWeight, 1e-10);
     }
 
     private void normalizeWeights() {
@@ -139,8 +164,18 @@ public class MCL {
         for (double w : weights) {
             sum += w;
         }
-        for (int i = 0; i < weights.size(); i++) {
-            weights.set(i, weights.get(i) / sum);
+
+        if (sum < 1e-10) {
+            // Reset to uniform weights
+            for (int i = 0; i < weights.size(); i++) {
+                weights.set(i, 1.0 / weights.size());
+            }
+            totalWeight = 1.0;
+        } else {
+            for (int i = 0; i < weights.size(); i++) {
+                weights.set(i, weights.get(i) / sum);
+            }
+            totalWeight = 1.0;
         }
     }
 
@@ -178,5 +213,48 @@ public class MCL {
             res += expectedReadingOffsetSides;
         }
         return res;
+    }
+
+    private void resampleParticles() {
+        ArrayList<Pose> newParticles = new ArrayList<>();
+        ArrayList<Double> newWeights = new ArrayList<>();
+
+        double[] cumulativeWeights = new double[weights.size()];
+        cumulativeWeights[0] = weights.get(0);
+        for (int i = 1; i < weights.size(); i++) {
+            cumulativeWeights[i] = cumulativeWeights[i - 1] + weights.get(i);
+        }
+        double segmentSize = 1.0 / numParticles;
+
+        for (int i = 0; i < numParticles; i++) {
+            double u = (Math.random() + i) * segmentSize;
+
+            int selectedIndex = 0;
+            while (selectedIndex < cumulativeWeights.length - 1 && u > cumulativeWeights[selectedIndex]) {
+                selectedIndex++;
+            }
+
+            Pose original = particles.get(selectedIndex);
+            double noiseX = SimMath.getGaussianError(0.5);
+            double noiseY = SimMath.getGaussianError(0.5);
+            double noiseTheta = SimMath.getGaussianError(0.1);
+
+            if (Math.random() < 0.1) {
+                newParticles.add(redistributeParticle());
+            } else {
+                newParticles.add(new Pose(
+                        original.x + noiseX,
+                        original.y + noiseY,
+                        MathPP.angleWrap(original.heading + noiseTheta, true)
+                ));
+            }
+            newWeights.add(1.0 / numParticles);
+        }
+
+        particles.clear();
+        particles.addAll(newParticles);
+        weights.clear();
+        weights.addAll(newWeights);
+        totalWeight = 1.0;
     }
 }
