@@ -30,12 +30,8 @@ public class SwerveModule {
     public void setPose(util.Pose newPose) {
         this.pose = newPose;
     }
-    public void updatePose(double dX, double dY) {
-        pose.x += dX;
-        pose.y += dY;
-    }
 
-    public void render(Graphics2D g2d) {
+    public void render(Graphics2D g2d, util.Pose parentPose) {
         g2d.setColor(Color.black);
         g2d.setStroke(new BasicStroke(3.5f));
         util.Pose newPose = SimMath.cartesianToPixels(pose);
@@ -43,7 +39,7 @@ public class SwerveModule {
         double y = newPose.y;
         AffineTransform old = g2d.getTransform();
         g2d.translate(x, y);
-        g2d.rotate(pose.heading);
+        g2d.rotate(pose.heading - parentPose.heading);
         g2d.translate(-x, -y);
         Rectangle2D rect = new Rectangle2D.Double(x - width / 2, y - length / 2, width, length);
         g2d.draw(rect);

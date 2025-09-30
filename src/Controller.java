@@ -5,18 +5,17 @@ import java.awt.event.KeyListener;
 import java.util.HashMap;
 
 public class Controller implements KeyListener {
-    // Track key states
     private HashMap<Integer, Boolean> keyStates = new HashMap<>();
+    double speed  = 1;
 
-    // Update drive based on current key states
     private void updateDrive() {
-        int leftY = (keyStates.containsKey(KeyEvent.VK_W) && keyStates.get(KeyEvent.VK_W) ? 1 : 0) +
-                    (keyStates.containsKey(KeyEvent.VK_S) && keyStates.get(KeyEvent.VK_S) ? -1 : 0);
-        int leftX = (keyStates.containsKey(KeyEvent.VK_A) && keyStates.get(KeyEvent.VK_A) ? -1 : 0) +
-                    (keyStates.containsKey(KeyEvent.VK_D) && keyStates.get(KeyEvent.VK_D) ? 1 : 0);
+        double leftY = (keyStates.containsKey(KeyEvent.VK_W) && keyStates.get(KeyEvent.VK_W) ? speed : 0) +
+                    (keyStates.containsKey(KeyEvent.VK_S) && keyStates.get(KeyEvent.VK_S) ? -speed : 0);
+        double leftX = (keyStates.containsKey(KeyEvent.VK_A) && keyStates.get(KeyEvent.VK_A) ? -speed : 0) +
+                    (keyStates.containsKey(KeyEvent.VK_D) && keyStates.get(KeyEvent.VK_D) ? speed : 0);
 
-        int rightX = (keyStates.containsKey(KeyEvent.VK_LEFT) && keyStates.get(KeyEvent.VK_LEFT) ? -1 : 0) +
-                     (keyStates.containsKey(KeyEvent.VK_RIGHT) && keyStates.get(KeyEvent.VK_RIGHT) ? 1 : 0);
+        double rightX = (keyStates.containsKey(KeyEvent.VK_LEFT) && keyStates.get(KeyEvent.VK_LEFT) ? -speed : 0) +
+                     (keyStates.containsKey(KeyEvent.VK_RIGHT) && keyStates.get(KeyEvent.VK_RIGHT) ? speed : 0);
 
         double L = SimMath.pixelsToInches(Main.field.chassis.length);
         double W = SimMath.pixelsToInches(Main.field.chassis.width);
@@ -36,14 +35,20 @@ public class Controller implements KeyListener {
         double backLeftAngle = Math.atan2(a, d);
         double frontRightAngle = Math.atan2(b, c);
         double frontLeftAngle = Math.atan2(b, d);
-
-        Main.field.chassis.modules[0].setAngleRads(frontLeftAngle);
+        if (Math.abs(leftX) <= 1e-2 && Math.abs(leftY) <= 1e-2 && Math.abs(rightX) <= 1e-2) {
+            frontLeftSpeed = 0;
+            frontRightSpeed = 0;
+            backLeftSpeed = 0;
+            backRightSpeed = 0;
+        } else {
+            Main.field.chassis.modules[0].setAngleRads(frontLeftAngle);
+            Main.field.chassis.modules[1].setAngleRads(frontRightAngle);
+            Main.field.chassis.modules[2].setAngleRads(backLeftAngle);
+            Main.field.chassis.modules[3].setAngleRads(backRightAngle);
+        }
         Main.field.chassis.modules[0].setSpeed(frontLeftSpeed);
-        Main.field.chassis.modules[1].setAngleRads(frontRightAngle);
         Main.field.chassis.modules[1].setSpeed(frontRightSpeed);
-        Main.field.chassis.modules[2].setAngleRads(backLeftAngle);
         Main.field.chassis.modules[2].setSpeed(backLeftSpeed);
-        Main.field.chassis.modules[3].setAngleRads(backRightAngle);
         Main.field.chassis.modules[3].setSpeed(backRightSpeed);
     }
 

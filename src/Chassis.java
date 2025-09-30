@@ -56,8 +56,21 @@ public class Chassis {
         pose.heading += angularVelocity;
         pose.heading %= 2 * Math.PI;
     }
-
+    private void normalizeSpeeds() {
+        double maxSpeed = 1.0;
+        double highest = 0;
+        for(SwerveModule module : modules) {
+            highest = Math.max(highest, module.velocity.magnitude);
+        }
+        if(highest > maxSpeed) {
+            double ratio = maxSpeed / highest;
+            for(SwerveModule module : modules) {
+                module.velocity.magnitude *= ratio;
+            }
+        }
+    }
     private VelocityVector sumSwerveVelocity() {
+        normalizeSpeeds();
         double sumX = 0;
         double sumY = 0;
         for(SwerveModule module : modules) {
@@ -134,7 +147,7 @@ public class Chassis {
         g2d.draw(headingLine);
         for(SwerveModule module : modules) {
             if(module == null) continue;
-            module.render(g2d);
+            module.render(g2d, pose);
         }
         g2d.setTransform(old);
     }
