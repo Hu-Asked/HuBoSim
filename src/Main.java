@@ -16,7 +16,13 @@ public class Main {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("HuBoSim");
-        Chassis chassis = new Chassis(10, 12, 3.5, new Pose(0, 0, 0));
+        SwerveModule l1, l2, r1, r2;
+        l1 = new SwerveModule(2, 2);
+        l2 = new SwerveModule(2, 2);
+        r1 = new SwerveModule(2, 2);
+        r2 = new SwerveModule(2, 2);
+        Chassis chassis = new Chassis(18, 18, 3.5, new Pose(0, 0, 0));
+        chassis.addSwerveModules(l1, r1, l2, r2);
         Controller master = new Controller();
         PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
         field = new Field(chassis, pp);
