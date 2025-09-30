@@ -1,26 +1,34 @@
 import util.VelocityVector;
 
+import javax.xml.crypto.dsig.Transform;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 public class SwerveModule {
-    private double angleRads = 0;
-    private double speed = 0;
     private final double length;
     private final double width;
-    public VelocityVector velocity = new VelocityVector(0, 0);
-    public util.Pose pose = new util.Pose(0, 0, angleRads);
+    public VelocityVector velocity = new VelocityVector(0);
+    public util.Pose pose = new util.Pose(0, 0, 0);
 
     public SwerveModule(double length, double width) {
         this.length = SimMath.inchesToPixels(length);
         this.width = SimMath.inchesToPixels(width);
+        this.velocity.setDirection(0);
+    }
+
+    public void setAngleRads(double angleRads) {
+        this.pose.heading = angleRads;
+    }
+
+    public void setSpeed(double speed) {
+        this.velocity.magnitude = speed;
+        this.velocity.setDirection(-this.pose.heading);
     }
 
     public void setPose(util.Pose newPose) {
         this.pose = newPose;
-        this.angleRads = newPose.heading;
     }
     public void updatePose(double dX, double dY) {
         pose.x += dX;
@@ -46,5 +54,6 @@ public class SwerveModule {
         double lineY2 = y - length / 2 + headingLineLength;
         Line2D headingLine = new Line2D.Double(lineX1, lineY1, lineX2, lineY2);
         g2d.draw(headingLine);
+        g2d.setTransform(old);
     }
 }

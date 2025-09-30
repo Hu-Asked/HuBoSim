@@ -1,4 +1,5 @@
 import util.Pose;
+import util.VelocityVector;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,8 +22,9 @@ public class Main {
         l2 = new SwerveModule(2, 2);
         r1 = new SwerveModule(2, 2);
         r2 = new SwerveModule(2, 2);
-        Chassis chassis = new Chassis(18, 18, 3.5, new Pose(0, 0, 0));
+        Chassis chassis = new Chassis(12, 12, 3.5, new Pose(0, 0, 0));
         chassis.addSwerveModules(l1, r1, l2, r2);
+
         Controller master = new Controller();
         PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
         field = new Field(chassis, pp);

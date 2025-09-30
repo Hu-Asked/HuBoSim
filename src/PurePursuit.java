@@ -55,16 +55,16 @@ public class PurePursuit {
         this.aHeading = absoluteHeading * 180/Math.PI;
         if(Math.abs(relativeHeading) > Math.PI / 3) {
             double turnPow = Math.clamp(kPt*relativeHeading, -2.5, 2.5) * movePow;
-            chassis.leftDrive(-turnPow);
-            chassis.rightDrive(turnPow);
+//            chassis.leftDrive(-turnPow);
+//            chassis.rightDrive(turnPow);
             return;
         }
 
         double curve = MathPP.findCurvature(relativeHeading, distance);
         double turnPow = ((curve * trackWidth)/2.0) * movePow;
 
-        chassis.leftDrive(movePow - turnPow);
-        chassis.rightDrive(movePow + turnPow);
+//        chassis.leftDrive(movePow - turnPow);
+//        chassis.rightDrive(movePow + turnPow);
     }
 
     public Point getTargetPoint(final ArrayList<Line2D> path) {
@@ -153,8 +153,8 @@ public class PurePursuit {
 
         Point target = getTargetPoint(strippedPath);
         if(isPathComplete(strippedPath)) {
-            chassis.leftDrive(0);
-            chassis.rightDrive(0);
+//            chassis.leftDrive(0);
+//            chassis.rightDrive(0);
             exit = true;
             return;
         }

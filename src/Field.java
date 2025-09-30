@@ -120,6 +120,14 @@ public class Field extends JPanel {
         g2d.drawString(
                 String.format("Segment: %d . Scalar: %.2f . Progress: %.2f%%", pp.pathSegIndex, pp.pathSegmentScalarProgression, pp.pathFollowPercentage),
                 debugX, debugY + 60);
+        g2d.drawString(
+                String.format("Front Left: %.2f | Front Right: %.2f", chassis.modules[0].velocity.magnitude, chassis.modules[1].velocity.magnitude),
+                debugX, debugY + 80
+        );
+        g2d.drawString(
+                String.format("Back Left: %.2f | Back Right: %.2f", chassis.modules[2].velocity.magnitude, chassis.modules[3].velocity.magnitude),
+                debugX, debugY + 100
+        );
     }
     public void drawLookaheadCircle(Graphics g, double lookaheadDistance) {
         Graphics2D g2d = (Graphics2D) g;
