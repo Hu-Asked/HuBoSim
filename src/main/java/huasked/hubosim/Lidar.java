@@ -1,4 +1,6 @@
-import util.Line2D;
+package huasked.hubosim;
+
+import huasked.hubosim.util.Line2D;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -29,24 +31,24 @@ public class Lidar {
     }
 
     public void updateSensorLines() {
-        util.Pose pose = SimMath.cartesianToPixels(this.chassis.pose);
+        huasked.hubosim.util.Pose pose = SimMath.cartesianToPixels(this.chassis.pose);
         double x = pose.x;
         double y = pose.y;
         double angle = pose.heading;
         double length = SimMath.inchesToPixels(maxRange);
-        sensors[Direction.FRONT.ordinal()] =  new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle - Math.PI/2), y + length * Math.sin(angle - Math.PI/2)));
-        sensors[Direction.RIGHT.ordinal()] = new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle), y + length * Math.sin(angle)));
-        sensors[Direction.BACK.ordinal()] = new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle + Math.PI/2), y + length * Math.sin(angle + Math.PI/2)));
-        sensors[Direction.LEFT.ordinal()] = new Line2D(new util.Point(x, y), new util.Point(x + length * Math.cos(angle + Math.PI), y + length * Math.sin(angle + Math.PI)));
+        sensors[Direction.FRONT.ordinal()] =  new Line2D(new huasked.hubosim.util.Point(x, y), new huasked.hubosim.util.Point(x + length * Math.cos(angle - Math.PI/2), y + length * Math.sin(angle - Math.PI/2)));
+        sensors[Direction.RIGHT.ordinal()] = new Line2D(new huasked.hubosim.util.Point(x, y), new huasked.hubosim.util.Point(x + length * Math.cos(angle), y + length * Math.sin(angle)));
+        sensors[Direction.BACK.ordinal()] = new Line2D(new huasked.hubosim.util.Point(x, y), new huasked.hubosim.util.Point(x + length * Math.cos(angle + Math.PI/2), y + length * Math.sin(angle + Math.PI/2)));
+        sensors[Direction.LEFT.ordinal()] = new Line2D(new huasked.hubosim.util.Point(x, y), new huasked.hubosim.util.Point(x + length * Math.cos(angle + Math.PI), y + length * Math.sin(angle + Math.PI)));
         this.checkForIntersections(Main.field.walls);
     }
 
     public void checkForIntersections(Line2D[] walls) {
         boolean[] foundIntersection = new boolean[sensors.length];
         for(Direction dir : Direction.values()) {
-            for(util.Line2D wall : walls) {
+            for(huasked.hubosim.util.Line2D wall : walls) {
                 Line2D sensor = sensors[dir.ordinal()];
-                util.Point intersection = SimMath.getLineIntersection(sensor, wall);
+                huasked.hubosim.util.Point intersection = SimMath.getLineIntersection(sensor, wall);
                 if(intersection != null) {
                     double dx = intersection.x - sensor.start.x;
                     double dy = intersection.y - sensor.start.y;

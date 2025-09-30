@@ -1,3 +1,5 @@
+package huasked.hubosim;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
@@ -17,11 +19,11 @@ public class Field extends JPanel {
                     {WIDTH - MARGIN, HEIGHT - MARGIN},    // bottom-right
                     {MARGIN, HEIGHT - MARGIN}};           // bottom-left
 
-    public final util.Line2D[] walls = {
-            new util.Line2D(new util.Point(corners[0][0], corners[0][1]), new util.Point(corners[1][0], corners[1][1])), // top wall
-            new util.Line2D(new util.Point(corners[1][0], corners[1][1]), new util.Point(corners[2][0], corners[2][1])), // right wall
-            new util.Line2D(new util.Point(corners[2][0], corners[2][1]), new util.Point(corners[3][0], corners[3][1])), // bottom wall
-            new util.Line2D(new util.Point(corners[3][0], corners[3][1]), new util.Point(corners[0][0], corners[0][1]))  // left wall
+    public final huasked.hubosim.util.Line2D[] walls = {
+            new huasked.hubosim.util.Line2D(new huasked.hubosim.util.Point(corners[0][0], corners[0][1]), new huasked.hubosim.util.Point(corners[1][0], corners[1][1])), // top wall
+            new huasked.hubosim.util.Line2D(new huasked.hubosim.util.Point(corners[1][0], corners[1][1]), new huasked.hubosim.util.Point(corners[2][0], corners[2][1])), // right wall
+            new huasked.hubosim.util.Line2D(new huasked.hubosim.util.Point(corners[2][0], corners[2][1]), new huasked.hubosim.util.Point(corners[3][0], corners[3][1])), // bottom wall
+            new huasked.hubosim.util.Line2D(new huasked.hubosim.util.Point(corners[3][0], corners[3][1]), new huasked.hubosim.util.Point(corners[0][0], corners[0][1]))  // left wall
     };
 
     public PurePursuit pp;
@@ -39,22 +41,22 @@ public class Field extends JPanel {
         Rectangle2D rect = new Rectangle2D.Double(0, 0, WIDTH, HEIGHT);
         g2d.fill(rect);
         drawField(g);
-//        drawPath(g, Main.chosenPath, Color.CYAN);
+//        drawPath(g, huasked.hubosim.Main.chosenPath, Color.CYAN);
 //        drawPath(g, pp.actualPath, Color.GREEN);
 //        drawLookaheadCircle(g, pp.lookaheadDistance);
-//        Main.lidar.drawSensorLines(g);
-//        Main.mcl.drawParticles(g, 6);
+//        huasked.hubosim.Main.lidar.drawSensorLines(g);
+//        huasked.hubosim.Main.mcl.drawParticles(g, 6);
         chassis.render(g);
     }
-    public void drawPath(Graphics g, ArrayList<Map.Entry<util.Point, Double>> path, Color color) {
+    public void drawPath(Graphics g, ArrayList<Map.Entry<huasked.hubosim.util.Point, Double>> path, Color color) {
         if (path == null || path.isEmpty()) return;
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(2.0f));
         for (int i = 0; i < path.size() - 1; i++) {
-            util.Point start = path.get(i).getKey();
-            util.Point end = path.get(i + 1).getKey();
+            huasked.hubosim.util.Point start = path.get(i).getKey();
+            huasked.hubosim.util.Point end = path.get(i + 1).getKey();
             Line2D line = new Line2D.Double(
                     SimMath.inchesToPixels(start.x) + WIDTH / 2,
                     SimMath.inchesToPixels(-start.y) + HEIGHT / 2,
@@ -70,7 +72,7 @@ public class Field extends JPanel {
         repaint();
     }
     private void constrainChassis() {
-        util.Pose pose = chassis.pose;
+        huasked.hubosim.util.Pose pose = chassis.pose;
         double halfWidth = SimMath.pixelsToInches(chassis.width) / 2;
         double halfLength = SimMath.pixelsToInches(chassis.length) / 2;
         if(pose.x - halfWidth < - 70) {
@@ -91,11 +93,11 @@ public class Field extends JPanel {
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(4.0f));
 
-        for (util.Line2D line : walls) {
+        for (huasked.hubosim.util.Line2D line : walls) {
             Line2D nLine = new Line2D.Double(line.start.x, line.start.y, line.end.x, line.end.y);
             g2d.draw(nLine);
         }
-        util.Pose robPose = SimMath.cartesianToPixels(chassis.pose);
+        huasked.hubosim.util.Pose robPose = SimMath.cartesianToPixels(chassis.pose);
         double robotX = inchesToScreenX(chassis.pose.x);
         double robotY = inchesToScreenY(chassis.pose.y);
         double robotDotRadius = 8;
@@ -106,7 +108,7 @@ public class Field extends JPanel {
                 (int)(robotDotRadius * 2),
                 (int)(robotDotRadius * 2)
         );
-        util.Point target = pp.targetPoint;
+        huasked.hubosim.util.Point target = pp.targetPoint;
         g2d.drawString(
                 String.format("Target: (%.2f, %.2f)", target.x, target.y),
                 debugX, debugY
@@ -138,7 +140,7 @@ public class Field extends JPanel {
         double radiusPixels = SimMath.inchesToPixels(lookaheadDistance);
 
         // Center the circle on the robot's position
-        util.Pose center = SimMath.cartesianToPixels(chassis.pose);
+        huasked.hubosim.util.Pose center = SimMath.cartesianToPixels(chassis.pose);
         double centerX = center.x;
         double centerY = center.y;
 

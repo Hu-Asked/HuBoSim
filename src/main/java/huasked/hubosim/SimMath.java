@@ -1,3 +1,5 @@
+package huasked.hubosim;
+
 import java.util.Random;
 
 public class SimMath {
@@ -13,15 +15,15 @@ public class SimMath {
         return pixels*baseSize/fieldSize;
     }
 
-    public static util.Pose pixelsToCartesian(util.Pose pose) {
-        return new util.Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading);
+    public static huasked.hubosim.util.Pose pixelsToCartesian(huasked.hubosim.util.Pose pose) {
+        return new huasked.hubosim.util.Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading);
     }
 
-    public static util.Pose cartesianToPixels(util.Pose pose) {
-        return new util.Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading);
+    public static huasked.hubosim.util.Pose cartesianToPixels(huasked.hubosim.util.Pose pose) {
+        return new huasked.hubosim.util.Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading);
     }
 
-    public static util.Point getLineIntersection(util.Line2D line1, util.Line2D line2) {
+    public static huasked.hubosim.util.Point getLineIntersection(huasked.hubosim.util.Line2D line1, huasked.hubosim.util.Line2D line2) {
         double x1 = line1.start.x, y1 = line1.start.y;
         double x2 = line1.end.x, y2 = line1.end.y;
         double x3 = line2.start.x, y3 = line2.start.y;
@@ -41,7 +43,7 @@ public class SimMath {
             return null;
         }
 
-        return new util.Point(px, py);
+        return new huasked.hubosim.util.Point(px, py);
     }
 
     public static double getGaussianError(double errorMarginPct) {

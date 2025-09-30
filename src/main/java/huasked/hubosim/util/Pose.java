@@ -1,4 +1,4 @@
-package util;
+package huasked.hubosim.util;
 
 public class Pose {
     public double x;

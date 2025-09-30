@@ -1,6 +1,8 @@
-import util.Line2D;
-import util.Point;
-import util.Pose;
+package huasked.hubosim;
+
+import huasked.hubosim.util.Line2D;
+import huasked.hubosim.util.Point;
+import huasked.hubosim.util.Pose;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -25,8 +27,8 @@ public class PurePursuit {
     public boolean exit = false;
     public boolean release = false;
 
-    public util.Point targetPoint = new util.Point(0,0);
-    public ArrayList<Map.Entry<util.Point, Double>> actualPath = new ArrayList<>();
+    public huasked.hubosim.util.Point targetPoint = new huasked.hubosim.util.Point(0,0);
+    public ArrayList<Map.Entry<huasked.hubosim.util.Point, Double>> actualPath = new ArrayList<>();
 
     public PurePursuit(Chassis chassis, double kPt, double kPd, double trackWidth) {
         this.chassis = chassis;

@@ -1,4 +1,4 @@
-package util;
+package huasked.hubosim.util;
 
 public class Line2D {
     public Point start;

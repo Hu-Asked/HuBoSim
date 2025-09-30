@@ -1,5 +1,7 @@
-import util.Pose;
-import util.VelocityVector;
+package huasked.hubosim;
+
+import huasked.hubosim.control.KeyboardController;
+import huasked.hubosim.util.Pose;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,11 +9,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Main {
-    static Field field;
-    static Lidar lidar;
-    static MCL mcl;
+    public static Field field;
+    public static Lidar lidar;
+    public static MCL mcl;
     public static final int FIELD_SIZE = 880;
-    public static ArrayList<Map.Entry<util.Point, Double>> chosenPath = PPPaths.samplePath;
+    public static ArrayList<Map.Entry<huasked.hubosim.util.Point, Double>> chosenPath = PPPaths.samplePath;
     public static boolean start = false;
     public static double[] expectedDist = {-1, -1, -1, -1};
 
@@ -25,7 +27,7 @@ public class Main {
         Chassis chassis = new Chassis(12, 12, 3.5, new Pose(0, 0, 0));
         chassis.addSwerveModules(l1, r1, l2, r2);
 
-        Controller master = new Controller();
+        KeyboardController master = new KeyboardController();
         PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
         field = new Field(chassis, pp);
         lidar = new Lidar(50, chassis);
@@ -51,7 +53,7 @@ public class Main {
             return;
         }
         while(true) {
-//            for (Lidar.Direction dir : Lidar.Direction.values()) {
+//            for (huasked.hubosim.Lidar.Direction dir : huasked.hubosim.Lidar.Direction.values()) {
 //                int i = dir.ordinal();
 //                expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);
 //            }
@@ -61,7 +63,7 @@ public class Main {
 //            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 4);
 //            pp.waitUntil(60);
 //            if(pp.release) {
-//                chosenPath = PPPaths.samplePath1;
+//                chosenPath = huasked.hubosim.PPPaths.samplePath1;
 //                pp.initializePath(pp.getStrippedPath(chosenPath));
 //            }
 

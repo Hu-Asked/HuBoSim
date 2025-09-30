@@ -1,10 +1,12 @@
-import util.Pose;
+package huasked.hubosim;
+
+import huasked.hubosim.util.Pose;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class MCL {
-    private final ArrayList<util.Pose> particles;
+    private final ArrayList<huasked.hubosim.util.Pose> particles;
     private final ArrayList<Double> weights;
     private final Lidar lidar;
     private final Chassis chassis;
@@ -19,7 +21,7 @@ public class MCL {
     private double expectedReadingOffsetSides = 0;
     private Pose prevPose;
     private Pose currPose;
-    public util.Pose estimatedPose;
+    public huasked.hubosim.util.Pose estimatedPose;
 
     public MCL(int numParticles, double minDistTravel, double expectedReadingOffsetLat, double expecctedReadingOffsetSides, Lidar lidar, Chassis chassis) {
         this.numParticles = numParticles;
@@ -32,16 +34,16 @@ public class MCL {
         this.currPose = prevPose;
         this.expectedReadingOffsetLat = expectedReadingOffsetLat;
         this.expectedReadingOffsetSides = expecctedReadingOffsetSides;
-        this.estimatedPose = new util.Pose(chassis.pose.x, chassis.pose.y, chassis.pose.heading);
+        this.estimatedPose = new huasked.hubosim.util.Pose(chassis.pose.x, chassis.pose.y, chassis.pose.heading);
         initializeParticles();
     }
 
-    private util.Pose redistributeParticle() {
+    private huasked.hubosim.util.Pose redistributeParticle() {
         double FIELD_SIZE = Main.FIELD_SIZE;
         double MARGIN = Main.field.MARGIN;
         double x = Math.random() * (FIELD_SIZE - MARGIN) + MARGIN;
         double y = Math.random() * (FIELD_SIZE - MARGIN) + MARGIN;
-        return SimMath.pixelsToCartesian(new util.Pose(x, y, Math.random() * 2 * Math.PI));
+        return SimMath.pixelsToCartesian(new huasked.hubosim.util.Pose(x, y, Math.random() * 2 * Math.PI));
     }
     private void initializeParticles() {
         for (int i = 0; i < numParticles; i++) {
@@ -52,8 +54,8 @@ public class MCL {
     }
 
     public void drawParticles(Graphics g, int radius) {
-        for (util.Pose p : particles) {
-            util.Pose pixelPose = SimMath.cartesianToPixels(p);
+        for (huasked.hubosim.util.Pose p : particles) {
+            huasked.hubosim.util.Pose pixelPose = SimMath.cartesianToPixels(p);
             g.setColor(Color.BLUE);
             int px = (int) pixelPose.x;
             int py = (int) pixelPose.y;
@@ -71,7 +73,7 @@ public class MCL {
 
     public void update() {
         this.prevPose = this.currPose;
-        this.currPose = new util.Pose(this.chassis.pose.x, this.chassis.pose.y, this.chassis.pose.heading);
+        this.currPose = new huasked.hubosim.util.Pose(this.chassis.pose.x, this.chassis.pose.y, this.chassis.pose.heading);
         this.updateX = this.currPose.x - this.prevPose.x;
         this.updateY = this.currPose.y - this.prevPose.y;
         this.updateTheta = this.currPose.heading - this.prevPose.heading;
@@ -88,7 +90,7 @@ public class MCL {
         double avgY = 0;
         double avgTheta = 0;
         for (int i = 0; i < numParticles; i++) {
-            util.Pose particle = particles.get(i);
+            huasked.hubosim.util.Pose particle = particles.get(i);
             double dth = updateTheta;
             particle.heading += dth;
 
@@ -99,7 +101,7 @@ public class MCL {
             avgY += particle.y;
             avgTheta += particle.heading;
             if (isOutOfBounds(particle)) {
-                util.Pose newPose = redistributeParticle();
+                huasked.hubosim.util.Pose newPose = redistributeParticle();
                 particle.x = newPose.x;
                 particle.y = newPose.y;
                 particle.heading = newPose.heading;
@@ -107,7 +109,7 @@ public class MCL {
         }
 
         for (int i = 0; i < numParticles; i++) {
-            util.Pose particle = particles.get(i);
+            huasked.hubosim.util.Pose particle = particles.get(i);
             double weight = weighParticle(particle);
             weights.set(i, weight);
             totalWeight += weight;
@@ -135,7 +137,7 @@ public class MCL {
         return 1.0 / sumSquared;
     }
 
-    private double weighParticle(util.Pose p) {
+    private double weighParticle(huasked.hubosim.util.Pose p) {
         double totalWeight = 1.0;
         int validReadings = 0;
 
@@ -179,10 +181,10 @@ public class MCL {
         }
     }
 
-    private boolean isOutOfBounds(util.Pose p) {
+    private boolean isOutOfBounds(huasked.hubosim.util.Pose p) {
         return !(p.x > -67 && p.x < 67 && p.y > -67 && p.y < 67);
     }
-    public double getParticleReading(util.Pose p, Lidar.Direction sensorDir) {
+    public double getParticleReading(huasked.hubosim.util.Pose p, Lidar.Direction sensorDir) {
         double sensorHeading = MathPP.angleWrap(p.heading + sensorDir.ordinal() * Math.PI / 2, true);
         int wall = lidar.detectedWall[sensorDir.ordinal()];
         if (wall == -1) return -1;

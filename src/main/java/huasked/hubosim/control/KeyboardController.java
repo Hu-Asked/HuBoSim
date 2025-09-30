@@ -1,10 +1,13 @@
-import util.VelocityVector;
+package huasked.hubosim.control;
+
+import huasked.hubosim.Main;
+import huasked.hubosim.SimMath;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
 
-public class Controller implements KeyListener {
+public class KeyboardController implements KeyListener {
     private HashMap<Integer, Boolean> keyStates = new HashMap<>();
     double speed  = 1;
 

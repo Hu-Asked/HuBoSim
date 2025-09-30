@@ -1,6 +1,7 @@
-import util.VelocityVector;
+package huasked.hubosim;
 
-import javax.xml.crypto.dsig.Transform;
+import huasked.hubosim.util.VelocityVector;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -10,7 +11,7 @@ public class SwerveModule {
     private final double length;
     private final double width;
     public VelocityVector velocity = new VelocityVector(0);
-    public util.Pose pose = new util.Pose(0, 0, 0);
+    public huasked.hubosim.util.Pose pose = new huasked.hubosim.util.Pose(0, 0, 0);
 
     public SwerveModule(double length, double width) {
         this.length = SimMath.inchesToPixels(length);
@@ -27,14 +28,14 @@ public class SwerveModule {
         this.velocity.setDirection(-this.pose.heading);
     }
 
-    public void setPose(util.Pose newPose) {
+    public void setPose(huasked.hubosim.util.Pose newPose) {
         this.pose = newPose;
     }
 
-    public void render(Graphics2D g2d, util.Pose parentPose) {
+    public void render(Graphics2D g2d, huasked.hubosim.util.Pose parentPose) {
         g2d.setColor(Color.black);
         g2d.setStroke(new BasicStroke(3.5f));
-        util.Pose newPose = SimMath.cartesianToPixels(pose);
+        huasked.hubosim.util.Pose newPose = SimMath.cartesianToPixels(pose);
         double x = newPose.x;
         double y = newPose.y;
         AffineTransform old = g2d.getTransform();

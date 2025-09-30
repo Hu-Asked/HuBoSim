@@ -1,4 +1,6 @@
-import util.VelocityVector;
+package huasked.hubosim;
+
+import huasked.hubosim.util.VelocityVector;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -6,8 +8,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
 
 public class Chassis {
-    final double width;
-    final double length;
+    public final double width;
+    public final double length;
     double latXVelocity = 0;
     double latYVelocity = 0;
     double angularVelocity = 0;
@@ -17,12 +19,12 @@ public class Chassis {
 
     private static final double HEADINGOFFSET = Math.PI/2;
 
-    public util.Pose pose;
+    public huasked.hubosim.util.Pose pose;
     public SwerveModule[] modules = new SwerveModule[4];
     public VelocityVector desiredLatVelocity = new VelocityVector(0);
     public VelocityVector desiredAngularVelocity = new VelocityVector(0);
 
-    public Chassis(int w, int l, double tc, util.Pose pose) {
+    public Chassis(int w, int l, double tc, huasked.hubosim.util.Pose pose) {
         this.width = SimMath.inchesToPixels(w);
         this.length = SimMath.inchesToPixels(l);
         this.turnConstant = tc;
@@ -38,13 +40,13 @@ public class Chassis {
     }
 
     public void positionSwerveModules(boolean useRobotHeading) {
-        modules[2].setPose(new util.Pose(pose.x - SimMath.pixelsToInches(width) / 2 - 1, pose.y - SimMath.pixelsToInches(length) / 2 - 1,
+        modules[2].setPose(new huasked.hubosim.util.Pose(pose.x - SimMath.pixelsToInches(width) / 2 - 1, pose.y - SimMath.pixelsToInches(length) / 2 - 1,
                 useRobotHeading ? pose.heading : modules[2].pose.heading));
-        modules[3].setPose(new util.Pose(pose.x + SimMath.pixelsToInches(width) / 2 + 1, pose.y - SimMath.pixelsToInches(length) / 2 - 1,
+        modules[3].setPose(new huasked.hubosim.util.Pose(pose.x + SimMath.pixelsToInches(width) / 2 + 1, pose.y - SimMath.pixelsToInches(length) / 2 - 1,
                 useRobotHeading ? pose.heading : modules[3].pose.heading));
-        modules[0].setPose(new util.Pose(pose.x - SimMath.pixelsToInches(width) / 2 - 1, pose.y + SimMath.pixelsToInches(length) / 2 + 1,
+        modules[0].setPose(new huasked.hubosim.util.Pose(pose.x - SimMath.pixelsToInches(width) / 2 - 1, pose.y + SimMath.pixelsToInches(length) / 2 + 1,
                 useRobotHeading ? pose.heading : modules[0].pose.heading));
-        modules[1].setPose(new util.Pose(pose.x + SimMath.pixelsToInches(width) / 2 + 1, pose.y + SimMath.pixelsToInches(length) / 2 + 1,
+        modules[1].setPose(new huasked.hubosim.util.Pose(pose.x + SimMath.pixelsToInches(width) / 2 + 1, pose.y + SimMath.pixelsToInches(length) / 2 + 1,
                 useRobotHeading ? pose.heading : modules[1].pose.heading));
     }
 
@@ -126,7 +128,7 @@ public class Chassis {
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(3.5f));
 
-        util.Pose newPose = SimMath.cartesianToPixels(pose);
+        huasked.hubosim.util.Pose newPose = SimMath.cartesianToPixels(pose);
         double x = newPose.x;
         double y = newPose.y;
 

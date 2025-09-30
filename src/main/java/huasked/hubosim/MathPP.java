@@ -1,6 +1,8 @@
-import util.Line2D;
-import util.Point;
-import util.Pose;
+package huasked.hubosim;
+
+import huasked.hubosim.util.Line2D;
+import huasked.hubosim.util.Point;
+import huasked.hubosim.util.Pose;
 
 import java.util.ArrayList;
 import java.util.Map;
