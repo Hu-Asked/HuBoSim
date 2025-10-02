@@ -1,11 +1,12 @@
 package huasked.hubosim;
 
+import huasked.hubosim.util.Pose;
 import huasked.hubosim.util.VelocityVector;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 
 public class Chassis {
     public final double width;
@@ -17,14 +18,14 @@ public class Chassis {
     double rightVelocity = 0;
     double turnConstant = 1.0;
 
-    private static final double HEADINGOFFSET = Math.PI/2;
+    private static final double HEADINGOFFSET = Math.PI / 2;
 
-    public huasked.hubosim.util.Pose pose;
+    public Pose pose;
     public SwerveModule[] modules = new SwerveModule[4];
     public VelocityVector desiredLatVelocity = new VelocityVector(0);
     public VelocityVector desiredAngularVelocity = new VelocityVector(0);
 
-    public Chassis(int w, int l, double tc, huasked.hubosim.util.Pose pose) {
+    public Chassis(int w, int l, double tc, Pose pose) {
         this.width = SimMath.inchesToPixels(w);
         this.length = SimMath.inchesToPixels(l);
         this.turnConstant = tc;
@@ -40,14 +41,14 @@ public class Chassis {
     }
 
     public void positionSwerveModules(boolean useRobotHeading) {
-        modules[2].setPose(new huasked.hubosim.util.Pose(pose.x - SimMath.pixelsToInches(width) / 2 - 1, pose.y - SimMath.pixelsToInches(length) / 2 - 1,
-                useRobotHeading ? pose.heading : modules[2].pose.heading));
-        modules[3].setPose(new huasked.hubosim.util.Pose(pose.x + SimMath.pixelsToInches(width) / 2 + 1, pose.y - SimMath.pixelsToInches(length) / 2 - 1,
-                useRobotHeading ? pose.heading : modules[3].pose.heading));
-        modules[0].setPose(new huasked.hubosim.util.Pose(pose.x - SimMath.pixelsToInches(width) / 2 - 1, pose.y + SimMath.pixelsToInches(length) / 2 + 1,
-                useRobotHeading ? pose.heading : modules[0].pose.heading));
-        modules[1].setPose(new huasked.hubosim.util.Pose(pose.x + SimMath.pixelsToInches(width) / 2 + 1, pose.y + SimMath.pixelsToInches(length) / 2 + 1,
-                useRobotHeading ? pose.heading : modules[1].pose.heading));
+        modules[2].setPose(new Pose(pose.x - SimMath.pixelsToInches(width) / 2 - 1, pose.y - SimMath.pixelsToInches(length) / 2 - 1,
+            useRobotHeading ? pose.heading : modules[2].pose.heading));
+        modules[3].setPose(new Pose(pose.x + SimMath.pixelsToInches(width) / 2 + 1, pose.y - SimMath.pixelsToInches(length) / 2 - 1,
+            useRobotHeading ? pose.heading : modules[3].pose.heading));
+        modules[0].setPose(new Pose(pose.x - SimMath.pixelsToInches(width) / 2 - 1, pose.y + SimMath.pixelsToInches(length) / 2 + 1,
+            useRobotHeading ? pose.heading : modules[0].pose.heading));
+        modules[1].setPose(new Pose(pose.x + SimMath.pixelsToInches(width) / 2 + 1, pose.y + SimMath.pixelsToInches(length) / 2 + 1,
+            useRobotHeading ? pose.heading : modules[1].pose.heading));
     }
 
     public void update() {
@@ -58,24 +59,26 @@ public class Chassis {
         pose.heading += angularVelocity;
         pose.heading %= 2 * Math.PI;
     }
+
     private void normalizeSpeeds() {
         double maxSpeed = 1.0;
         double highest = 0;
-        for(SwerveModule module : modules) {
+        for (SwerveModule module : modules) {
             highest = Math.max(highest, module.velocity.magnitude);
         }
-        if(highest > maxSpeed) {
+        if (highest > maxSpeed) {
             double ratio = maxSpeed / highest;
-            for(SwerveModule module : modules) {
+            for (SwerveModule module : modules) {
                 module.velocity.magnitude *= ratio;
             }
         }
     }
+
     private VelocityVector sumSwerveVelocity() {
         normalizeSpeeds();
         double sumX = 0;
         double sumY = 0;
-        for(SwerveModule module : modules) {
+        for (SwerveModule module : modules) {
             VelocityVector vel = new VelocityVector(module.velocity.magnitude);
             vel.setDirection(module.velocity.getDirection());
             vel.magnitude *= 0.25;
@@ -96,12 +99,16 @@ public class Chassis {
         double centerY = pose.y;
 
         for (SwerveModule module : modules) {
-            if (module == null) continue;
+            if (module == null) {
+                continue;
+            }
 
             double dx = module.pose.x - centerX;
             double dy = module.pose.y - centerY;
             double rSquared = dx * dx + dy * dy;
-            if (rSquared == 0) continue;
+            if (rSquared == 0) {
+                continue;
+            }
 
             double vx = module.velocity.getXComponent();
             double vy = module.velocity.getYComponent();
@@ -128,7 +135,7 @@ public class Chassis {
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(3.5f));
 
-        huasked.hubosim.util.Pose newPose = SimMath.cartesianToPixels(pose);
+        Pose newPose = SimMath.cartesianToPixels(pose);
         double x = newPose.x;
         double y = newPose.y;
 
@@ -147,8 +154,10 @@ public class Chassis {
         double lineY2 = y - length / 2 + headingLineLength;
         Line2D headingLine = new Line2D.Double(lineX1, lineY1, lineX2, lineY2);
         g2d.draw(headingLine);
-        for(SwerveModule module : modules) {
-            if(module == null) continue;
+        for (SwerveModule module : modules) {
+            if (module == null) {
+                continue;
+            }
             module.render(g2d, pose);
         }
         g2d.setTransform(old);

@@ -1,5 +1,6 @@
 package huasked.hubosim;
 
+import huasked.hubosim.util.Pose;
 import huasked.hubosim.util.VelocityVector;
 
 import java.awt.*;
@@ -11,7 +12,7 @@ public class SwerveModule {
     private final double length;
     private final double width;
     public VelocityVector velocity = new VelocityVector(0);
-    public huasked.hubosim.util.Pose pose = new huasked.hubosim.util.Pose(0, 0, 0);
+    public Pose pose = new Pose(0, 0, 0);
 
     public SwerveModule(double length, double width) {
         this.length = SimMath.inchesToPixels(length);
@@ -28,14 +29,14 @@ public class SwerveModule {
         this.velocity.setDirection(-this.pose.heading);
     }
 
-    public void setPose(huasked.hubosim.util.Pose newPose) {
+    public void setPose(Pose newPose) {
         this.pose = newPose;
     }
 
-    public void render(Graphics2D g2d, huasked.hubosim.util.Pose parentPose) {
+    public void render(Graphics2D g2d, Pose parentPose) {
         g2d.setColor(Color.black);
         g2d.setStroke(new BasicStroke(3.5f));
-        huasked.hubosim.util.Pose newPose = SimMath.cartesianToPixels(pose);
+        Pose newPose = SimMath.cartesianToPixels(pose);
         double x = newPose.x;
         double y = newPose.y;
         AffineTransform old = g2d.getTransform();

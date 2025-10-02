@@ -1,6 +1,6 @@
 package huasked.hubosim;
 
-import huasked.hubosim.util.Line2D;
+import huasked.hubosim.util.Line;
 import huasked.hubosim.util.Point;
 import huasked.hubosim.util.Pose;
 
@@ -27,8 +27,8 @@ public class PurePursuit {
     public boolean exit = false;
     public boolean release = false;
 
-    public huasked.hubosim.util.Point targetPoint = new huasked.hubosim.util.Point(0,0);
-    public ArrayList<Map.Entry<huasked.hubosim.util.Point, Double>> actualPath = new ArrayList<>();
+    public Point targetPoint = new Point(0, 0);
+    public ArrayList<Map.Entry<Point, Double>> actualPath = new ArrayList<>();
 
     public PurePursuit(Chassis chassis, double kPt, double kPd, double trackWidth) {
         this.chassis = chassis;
@@ -37,10 +37,10 @@ public class PurePursuit {
         this.trackWidth = trackWidth;
     }
 
-    public ArrayList<Map.Entry<Line2D, Double>> processPath(final ArrayList<Map.Entry<Point, Double>> unprocessedPath) {
-        ArrayList<Map.Entry<Line2D, Double>> path = new ArrayList<>();
+    public ArrayList<Map.Entry<Line, Double>> processPath(final ArrayList<Map.Entry<Point, Double>> unprocessedPath) {
+        ArrayList<Map.Entry<Line, Double>> path = new ArrayList<>();
         for (int i = 0; i < unprocessedPath.size() - 1; i++) {
-            Line2D line = new Line2D(unprocessedPath.get(i).getKey(), unprocessedPath.get(i + 1).getKey());
+            Line line = new Line(unprocessedPath.get(i).getKey(), unprocessedPath.get(i + 1).getKey());
             path.add(new HashMap.SimpleEntry<>(line, unprocessedPath.get(i).getValue()));
         }
         return path;
@@ -53,32 +53,32 @@ public class PurePursuit {
 
         double absoluteHeading = Math.atan2(-dy, dx) + Math.PI / 2;
         double relativeHeading = MathPP.angleWrap(absoluteHeading - MathPP.angleWrap(currentPose.heading, true), true);
-        this.rHeading = relativeHeading * 180/Math.PI;
-        this.aHeading = absoluteHeading * 180/Math.PI;
-        if(Math.abs(relativeHeading) > Math.PI / 3) {
-            double turnPow = Math.clamp(kPt*relativeHeading, -2.5, 2.5) * movePow;
+        this.rHeading = relativeHeading * 180 / Math.PI;
+        this.aHeading = absoluteHeading * 180 / Math.PI;
+        if (Math.abs(relativeHeading) > Math.PI / 3) {
+            double turnPow = Math.clamp(kPt * relativeHeading, -2.5, 2.5) * movePow;
 //            chassis.leftDrive(-turnPow);
 //            chassis.rightDrive(turnPow);
             return;
         }
 
         double curve = MathPP.findCurvature(relativeHeading, distance);
-        double turnPow = ((curve * trackWidth)/2.0) * movePow;
+        double turnPow = ((curve * trackWidth) / 2.0) * movePow;
 
 //        chassis.leftDrive(movePow - turnPow);
 //        chassis.rightDrive(movePow + turnPow);
     }
 
-    public Point getTargetPoint(final ArrayList<Line2D> path) {
+    public Point getTargetPoint(final ArrayList<Line> path) {
         Map.Entry<Point, Double> bestIntersection = null;
-        bestIntersection = new HashMap.SimpleEntry<>(new Point(0,0), -1.0);
+        bestIntersection = new HashMap.SimpleEntry<>(new Point(0, 0), -1.0);
         int segment = -1;
         boolean foundIntersection = false;
-        for(int i = pathSegIndex; i < path.size(); i++) {
+        for (int i = pathSegIndex; i < path.size(); i++) {
             ArrayList<Map.Entry<Point, Double>> intersections = MathPP.getCircleLineIntersection(currentPose, path.get(i), lookaheadDistance, true);
-            if(!intersections.isEmpty()) {
-                for(Map.Entry<Point, Double> intersection : intersections) {
-                    if(intersection.getValue() > bestIntersection.getValue() || i > segment) {
+            if (!intersections.isEmpty()) {
+                for (Map.Entry<Point, Double> intersection : intersections) {
+                    if (intersection.getValue() > bestIntersection.getValue() || i > segment) {
                         bestIntersection = intersection;
                         segment = i;
                         foundIntersection = true;
@@ -86,14 +86,14 @@ public class PurePursuit {
                 }
             }
         }
-        if(foundIntersection && segment >= pathSegIndex) {
+        if (foundIntersection && segment >= pathSegIndex) {
             pathSegIndex = segment;
             return this.targetPoint = bestIntersection.getKey();
         }
         return this.targetPoint = path.get(pathSegIndex).end;
     }
 
-    public void initializePath(ArrayList<Line2D> path) {
+    public void initializePath(ArrayList<Line> path) {
 
         this.pathFollowPercentage = 0;
         this.pathSegmentScalarProgression = 0;
@@ -104,31 +104,35 @@ public class PurePursuit {
         this.actualPath = new ArrayList<>();
 
         double minDist = 1e3;
-        for(int i = 0; i < path.size(); i++) {
-            Line2D line = path.get(i);
+        for (int i = 0; i < path.size(); i++) {
+            Line line = path.get(i);
             double dist = Math.hypot(line.start.x - currentPose.x, line.start.y - currentPose.y);
-            if(dist < minDist) {
+            if (dist < minDist) {
                 minDist = dist;
                 pathSegIndex = i;
             }
         }
     }
-    public void updateSegmentProgression(final ArrayList<Line2D> path) {
-        if(path.isEmpty() || pathSegIndex >= path.size()) return;
-        Line2D currentSegment = path.get(pathSegIndex);
+
+    public void updateSegmentProgression(final ArrayList<Line> path) {
+        if (path.isEmpty() || pathSegIndex >= path.size()) {
+            return;
+        }
+        Line currentSegment = path.get(pathSegIndex);
         double projectionScalar = MathPP.findProjectionScalar(currentSegment, new Point(currentPose.x, currentPose.y));
         projectionScalar = Math.max(0.0, Math.min(1.0, projectionScalar));
         pathSegmentScalarProgression = projectionScalar;
 
-        if(path.size() > 1) {
-            double segmentProgress = pathSegIndex / (double)(path.size()-1);
-            double intraSegmentProgress = pathSegmentScalarProgression / (double)(path.size()-1);
-            pathFollowPercentage = (segmentProgress + intraSegmentProgress)*100;
+        if (path.size() > 1) {
+            double segmentProgress = pathSegIndex / (double) (path.size() - 1);
+            double intraSegmentProgress = pathSegmentScalarProgression / (double) (path.size() - 1);
+            pathFollowPercentage = (segmentProgress + intraSegmentProgress) * 100;
         }
     }
-    public boolean isPathComplete(final ArrayList<Line2D> path) {
-        if(pathFollowPercentage >= 90 || pathSegIndex >= path.size() - 1) {
-            Line2D lastSegment = path.get(path.size() - 1);
+
+    public boolean isPathComplete(final ArrayList<Line> path) {
+        if (pathFollowPercentage >= 90 || pathSegIndex >= path.size() - 1) {
+            Line lastSegment = path.get(path.size() - 1);
             Point pathEnd = lastSegment.end;
             double distToEnd = Math.hypot(pathEnd.x - currentPose.x, pathEnd.y - currentPose.y);
             return distToEnd < lookaheadDistance;
@@ -137,24 +141,26 @@ public class PurePursuit {
     }
 
     public void waitUntil(double percentage) {
-        if(pathFollowPercentage > percentage) {
+        if (pathFollowPercentage > percentage) {
             release = true;
         }
     }
-    public ArrayList<Line2D> getStrippedPath(final ArrayList<Map.Entry<Point, Double>> unprocessedPath) {
-        ArrayList<Line2D> strippedPath = new ArrayList<>();
-        ArrayList<Map.Entry<Line2D, Double>> path = processPath(unprocessedPath);
-        for(Map.Entry<Line2D, Double> entry : path) {
+
+    public ArrayList<Line> getStrippedPath(final ArrayList<Map.Entry<Point, Double>> unprocessedPath) {
+        ArrayList<Line> strippedPath = new ArrayList<>();
+        ArrayList<Map.Entry<Line, Double>> path = processPath(unprocessedPath);
+        for (Map.Entry<Line, Double> entry : path) {
             strippedPath.add(entry.getKey());
         }
         return strippedPath;
     }
+
     public void followPath(final ArrayList<Map.Entry<Point, Double>> unprocessedPath, double lookaheadDistance, double maxSpeed, int segOffset) {
         this.lookaheadDistance = lookaheadDistance;
-        ArrayList<Line2D> strippedPath  = getStrippedPath(unprocessedPath);
+        ArrayList<Line> strippedPath = getStrippedPath(unprocessedPath);
 
         Point target = getTargetPoint(strippedPath);
-        if(isPathComplete(strippedPath)) {
+        if (isPathComplete(strippedPath)) {
 //            chassis.leftDrive(0);
 //            chassis.rightDrive(0);
             exit = true;
@@ -163,7 +169,7 @@ public class PurePursuit {
         actualPath.add(new AbstractMap.SimpleEntry<>(new Point(currentPose.x, currentPose.y), 0.0));
         indexOfSpeed = (pathSegIndex - segOffset);
         double speedMultiplier = unprocessedPath.get(Math.max(0, indexOfSpeed)).getValue();
-        goToPosition(target, maxSpeed * speedMultiplier/100);
+        goToPosition(target, maxSpeed * speedMultiplier / 100);
         updateSegmentProgression(strippedPath);
 
     }

@@ -1,5 +1,9 @@
 package huasked.hubosim;
 
+import huasked.hubosim.util.Line;
+import huasked.hubosim.util.Point;
+import huasked.hubosim.util.Pose;
+
 import java.util.Random;
 
 public class SimMath {
@@ -8,42 +12,44 @@ public class SimMath {
     public static Random rd = new Random();
 
     public static double inchesToPixels(double inches) {
-        return fieldSize/baseSize*inches;
+        return fieldSize / baseSize * inches;
     }
 
     public static double pixelsToInches(double pixels) {
-        return pixels*baseSize/fieldSize;
+        return pixels * baseSize / fieldSize;
     }
 
-    public static huasked.hubosim.util.Pose pixelsToCartesian(huasked.hubosim.util.Pose pose) {
-        return new huasked.hubosim.util.Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading);
+    public static Pose pixelsToCartesian(Pose pose) {
+        return new Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading);
     }
 
-    public static huasked.hubosim.util.Pose cartesianToPixels(huasked.hubosim.util.Pose pose) {
-        return new huasked.hubosim.util.Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading);
+    public static Pose cartesianToPixels(Pose pose) {
+        return new Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading);
     }
 
-    public static huasked.hubosim.util.Point getLineIntersection(huasked.hubosim.util.Line2D line1, huasked.hubosim.util.Line2D line2) {
+    public static Point getLineIntersection(Line line1, Line line2) {
         double x1 = line1.start.x, y1 = line1.start.y;
         double x2 = line1.end.x, y2 = line1.end.y;
         double x3 = line2.start.x, y3 = line2.start.y;
         double x4 = line2.end.x, y4 = line2.end.y;
 
         double dn = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-        if (Math.abs(dn) < 1e-8) return null; // Lines are parallel
+        if (Math.abs(dn) < 1e-8) {
+            return null; // Lines are parallel
+        }
 
-        double px = ((x1*y2 - y1*x2)*(x3 - x4) - (x1 - x2)*(x3*y4 - y3*x4)) / dn;
-        double py = ((x1*y2 - y1*x2)*(y3 - y4) - (y1 - y2)*(x3*y4 - y3*x4)) / dn;
+        double px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / dn;
+        double py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / dn;
 
         // Check if intersection is within both segments
         if (px < Math.min(x1, x2) - 1e-8 || px > Math.max(x1, x2) + 1e-8 ||
-                px < Math.min(x3, x4) - 1e-8 || px > Math.max(x3, x4) + 1e-8 ||
-                py < Math.min(y1, y2) - 1e-8 || py > Math.max(y1, y2) + 1e-8 ||
-                py < Math.min(y3, y4) - 1e-8 || py > Math.max(y3, y4) + 1e-8) {
+            px < Math.min(x3, x4) - 1e-8 || px > Math.max(x3, x4) + 1e-8 ||
+            py < Math.min(y1, y2) - 1e-8 || py > Math.max(y1, y2) + 1e-8 ||
+            py < Math.min(y3, y4) - 1e-8 || py > Math.max(y3, y4) + 1e-8) {
             return null;
         }
 
-        return new huasked.hubosim.util.Point(px, py);
+        return new Point(px, py);
     }
 
     public static double getGaussianError(double errorMarginPct) {

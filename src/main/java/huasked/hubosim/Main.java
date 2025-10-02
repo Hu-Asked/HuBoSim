@@ -1,6 +1,8 @@
 package huasked.hubosim;
 
+import huasked.hubosim.control.ControllerController;
 import huasked.hubosim.control.KeyboardController;
+import huasked.hubosim.util.Point;
 import huasked.hubosim.util.Pose;
 
 import javax.swing.*;
@@ -13,7 +15,7 @@ public class Main {
     public static Lidar lidar;
     public static MCL mcl;
     public static final int FIELD_SIZE = 880;
-    public static ArrayList<Map.Entry<huasked.hubosim.util.Point, Double>> chosenPath = PPPaths.samplePath;
+    public static ArrayList<Map.Entry<Point, Double>> chosenPath = PPPaths.samplePath;
     public static boolean start = false;
     public static double[] expectedDist = {-1, -1, -1, -1};
 
@@ -28,6 +30,7 @@ public class Main {
         chassis.addSwerveModules(l1, r1, l2, r2);
 
         KeyboardController master = new KeyboardController();
+        ControllerController controller = new ControllerController();
         PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
         field = new Field(chassis, pp);
         lidar = new Lidar(50, chassis);
@@ -46,14 +49,15 @@ public class Main {
 //        pp.currentPose = chassis.pose;
 //        pp.initializePath(pp.getStrippedPath(chosenPath));
         try {
-            while(!start) {
+            while (!start) {
                 Thread.sleep(1000);
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             return;
         }
-        while(true) {
-//            for (huasked.hubosim.Lidar.Direction dir : huasked.hubosim.Lidar.Direction.values()) {
+        while (true) {
+//            for (Lidar.Direction dir : Lidar.Direction.values()) {
 //                int i = dir.ordinal();
 //                expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);
 //            }
@@ -63,14 +67,15 @@ public class Main {
 //            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 4);
 //            pp.waitUntil(60);
 //            if(pp.release) {
-//                chosenPath = huasked.hubosim.PPPaths.samplePath1;
+//                chosenPath = PPPaths.samplePath1;
 //                pp.initializePath(pp.getStrippedPath(chosenPath));
 //            }
 
             field.updateField();
             try {
                 Thread.sleep(16);
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 return;
             }
         }

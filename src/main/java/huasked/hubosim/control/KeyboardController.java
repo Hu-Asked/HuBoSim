@@ -9,16 +9,16 @@ import java.util.HashMap;
 
 public class KeyboardController implements KeyListener {
     private HashMap<Integer, Boolean> keyStates = new HashMap<>();
-    double speed  = 1;
+    double speed = 1;
 
     private void updateDrive() {
         double leftY = (keyStates.containsKey(KeyEvent.VK_W) && keyStates.get(KeyEvent.VK_W) ? speed : 0) +
-                    (keyStates.containsKey(KeyEvent.VK_S) && keyStates.get(KeyEvent.VK_S) ? -speed : 0);
+            (keyStates.containsKey(KeyEvent.VK_S) && keyStates.get(KeyEvent.VK_S) ? -speed : 0);
         double leftX = (keyStates.containsKey(KeyEvent.VK_A) && keyStates.get(KeyEvent.VK_A) ? -speed : 0) +
-                    (keyStates.containsKey(KeyEvent.VK_D) && keyStates.get(KeyEvent.VK_D) ? speed : 0);
+            (keyStates.containsKey(KeyEvent.VK_D) && keyStates.get(KeyEvent.VK_D) ? speed : 0);
 
         double rightX = (keyStates.containsKey(KeyEvent.VK_LEFT) && keyStates.get(KeyEvent.VK_LEFT) ? -speed : 0) +
-                     (keyStates.containsKey(KeyEvent.VK_RIGHT) && keyStates.get(KeyEvent.VK_RIGHT) ? speed : 0);
+            (keyStates.containsKey(KeyEvent.VK_RIGHT) && keyStates.get(KeyEvent.VK_RIGHT) ? speed : 0);
 
         double L = SimMath.pixelsToInches(Main.field.chassis.length);
         double W = SimMath.pixelsToInches(Main.field.chassis.width);
@@ -43,7 +43,8 @@ public class KeyboardController implements KeyListener {
             frontRightSpeed = 0;
             backLeftSpeed = 0;
             backRightSpeed = 0;
-        } else {
+        }
+        else {
             Main.field.chassis.modules[0].setAngleRads(frontLeftAngle);
             Main.field.chassis.modules[1].setAngleRads(frontRightAngle);
             Main.field.chassis.modules[2].setAngleRads(backLeftAngle);
@@ -70,7 +71,7 @@ public class KeyboardController implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
-        if(key == KeyEvent.VK_SPACE) {
+        if (key == KeyEvent.VK_SPACE) {
             Main.start = true;
         }
         keyStates.put(key, false);

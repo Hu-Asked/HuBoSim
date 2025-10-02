@@ -1,6 +1,6 @@
 package huasked.hubosim;
 
-import huasked.hubosim.util.Line2D;
+import huasked.hubosim.util.Line;
 import huasked.hubosim.util.Point;
 import huasked.hubosim.util.Pose;
 
@@ -33,7 +33,7 @@ public class MathPP {
         return (vec1.x * vec2.x) + (vec1.y * vec2.y);
     }
 
-    public static double findProjectionScalar(final Line2D pathSegment, final Point point) {
+    public static double findProjectionScalar(final Line pathSegment, final Point point) {
         Point pathVec = new Point(pathSegment.end.x - pathSegment.start.x, pathSegment.end.y - pathSegment.start.y);
         Point pointVec = new Point(point.x - pathSegment.start.x, point.y - pathSegment.start.y);
 
@@ -42,7 +42,7 @@ public class MathPP {
         return dotProduct(pathVec, pointVec) / (magnitude * magnitude);
     }
 
-    public static ArrayList<Map.Entry<Point, Double>> getCircleLineIntersection (final Pose robotPose, final Line2D line, double lookaheadDistance, boolean getBoundedIntersections) {
+    public static ArrayList<Map.Entry<Point, Double>> getCircleLineIntersection (final Pose robotPose, final Line line, double lookaheadDistance, boolean getBoundedIntersections) {
         ArrayList<Map.Entry<Point, Double>> intersections = new ArrayList<>();
 
         double x1 = line.start.x;
