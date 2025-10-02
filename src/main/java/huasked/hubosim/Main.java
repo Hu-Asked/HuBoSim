@@ -44,6 +44,7 @@ public class Main {
         frame.requestFocusInWindow();
         frame.setVisible(true);
         frame.setResizable(false);
+        controller.init();
 //        chassis.pose.x = chosenPath.getFirst().getKey().x;
 //        chassis.pose.y = chosenPath.getFirst().getKey().y;
 //        pp.currentPose = chassis.pose;
@@ -57,12 +58,14 @@ public class Main {
             return;
         }
         while (true) {
+            controller.pollController();
 //            for (Lidar.Direction dir : Lidar.Direction.values()) {
 //                int i = dir.ordinal();
 //                expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);
 //            }
 //            lidar.updateSensorLines();
 //            mcl.update();
+            chassis.updateDrive(controller.leftStickX, controller.leftStickY, controller.rightStickX);
             pp.currentPose = chassis.pose;
 //            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 4);
 //            pp.waitUntil(60);

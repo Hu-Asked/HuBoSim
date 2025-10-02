@@ -4,6 +4,7 @@ import huasked.hubosim.util.Pose;
 import huasked.hubosim.util.VelocityVector;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -30,6 +31,43 @@ public class Chassis {
         this.length = SimMath.inchesToPixels(l);
         this.turnConstant = tc;
         this.pose = pose;
+    }
+    public void updateDrive(double leftX, double leftY, double rightX) {
+
+        double L = SimMath.pixelsToInches(this.length);
+        double W = SimMath.pixelsToInches(this.width);
+        double R = Math.hypot(L, W);
+
+        double a = leftX - rightX * (L / R);
+        double b = leftX + rightX * (L / R);
+        double c = leftY - rightX * (W / R);
+        double d = leftY + rightX * (W / R);
+
+        double backRightSpeed = Math.hypot(a, d);
+        double backLeftSpeed = Math.hypot(a, c);
+        double frontRightSpeed = Math.hypot(b, d);
+        double frontLeftSpeed = Math.hypot(b, c);
+
+        double backRightAngle = Math.atan2(a, c);
+        double backLeftAngle = Math.atan2(a, d);
+        double frontRightAngle = Math.atan2(b, c);
+        double frontLeftAngle = Math.atan2(b, d);
+        if (Math.abs(leftX) <= 2e-2 && Math.abs(leftY) <= 2e-2 && Math.abs(rightX) <= 2e-2) {
+            frontLeftSpeed = 0;
+            frontRightSpeed = 0;
+            backLeftSpeed = 0;
+            backRightSpeed = 0;
+        }
+        else {
+            this.modules[0].setAngleRads(frontLeftAngle);
+            this.modules[1].setAngleRads(frontRightAngle);
+            this.modules[2].setAngleRads(backLeftAngle);
+            this.modules[3].setAngleRads(backRightAngle);
+        }
+        this.modules[0].setSpeed(frontLeftSpeed);
+        this.modules[1].setSpeed(frontRightSpeed);
+        this.modules[2].setSpeed(backLeftSpeed);
+        this.modules[3].setSpeed(backRightSpeed);
     }
 
     public void addSwerveModules(SwerveModule leftFront, SwerveModule rightFront, SwerveModule leftBack, SwerveModule rightBack) {
@@ -61,7 +99,7 @@ public class Chassis {
     }
 
     private void normalizeSpeeds() {
-        double maxSpeed = 1.0;
+        double maxSpeed = 3.0;
         double highest = 0;
         for (SwerveModule module : modules) {
             highest = Math.max(highest, module.velocity.magnitude);
