@@ -65,7 +65,7 @@ public class Main {
 //            }
 //            lidar.updateSensorLines();
 //            mcl.update();
-            chassis.updateDrive(controller.leftStickX, controller.leftStickY, controller.rightStickX);
+            chassis.updateDrive(controller.leftStickX, controller.leftStickY, controller.rightStickX, controller.rightStickY);
             pp.currentPose = chassis.pose;
 //            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 4);
 //            pp.waitUntil(60);

@@ -47,13 +47,12 @@ public class ControllerController {
         // Get axis states (triggers/thumbsticks)
         FloatBuffer axes = glfwGetJoystickAxes(jid);
         int axesCount = axes.limit();
-
         // PS4 Axis Mappingq
         if (axesCount >= 6) {
             this.leftStickX = axes.get(0);   // Left Stick X
             this.leftStickY = -axes.get(1);   // Left Stick Y
             this.rightStickX = axes.get(2);  // Right Stick X
-            this.rightStickY = axes.get(3);  // Right Stick Y
+            this.rightStickY = -axes.get(5);  // Right Stick Y
         }
     }
 

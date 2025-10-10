@@ -32,16 +32,22 @@ public class Chassis {
         this.turnConstant = tc;
         this.pose = pose;
     }
-    public void updateDrive(double leftX, double leftY, double rightX) {
+    public void updateDrive(double leftX, double leftY, double rightX, double rightY) {
 
         double L = SimMath.pixelsToInches(this.length);
         double W = SimMath.pixelsToInches(this.width);
         double R = Math.hypot(L, W);
-
-        double a = leftX - rightX * (L / R);
-        double b = leftX + rightX * (L / R);
-        double c = leftY - rightX * (W / R);
-        double d = leftY + rightX * (W / R);
+        double targetHeading = this.pose.heading;
+        if (Math.sqrt(rightY * rightY + rightX * rightX) > 0.5) {
+            targetHeading = -(Math.atan2(rightY, rightX) - Math.PI / 2);
+        }
+        double delta = MathPP.angleWrap(targetHeading - MathPP.angleWrap(this.pose.heading, true), true);
+        double turnMulti = 0.75;
+        double angularMag = delta * turnMulti;
+        double a = leftX - angularMag * (L / R);
+        double b = leftX + angularMag * (L / R);
+        double c = leftY - angularMag * (W / R);
+        double d = leftY + angularMag * (W / R);
 
         double backRightSpeed = Math.hypot(a, d);
         double backLeftSpeed = Math.hypot(a, c);
