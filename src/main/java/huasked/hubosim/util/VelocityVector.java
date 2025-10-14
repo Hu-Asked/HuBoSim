@@ -2,10 +2,10 @@ package huasked.hubosim.util;
 
 public class VelocityVector {
     public double magnitude;
-    private double directionRads = -Math.PI / 2;
-
-    public VelocityVector(double magnitude) {
+    private double directionRads;
+    public VelocityVector(double magnitude, double directionRads) {
         this.magnitude = magnitude;
+        setDirection(directionRads);
     }
 
     public void setDirection(double directionRads) {

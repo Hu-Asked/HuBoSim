@@ -3,175 +3,72 @@ package huasked.hubosim;
 import huasked.hubosim.util.Line;
 import huasked.hubosim.util.Point;
 import huasked.hubosim.util.Pose;
+import jdk.dynalink.linker.support.CompositeTypeBasedGuardingDynamicLinker;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Map;
 
-public class Field extends JPanel {
-    public final double WIDTH = Main.FIELD_SIZE;
-    public final double HEIGHT = Main.FIELD_SIZE;
-    public final double MARGIN = 20;
-    int debugX = (int) MARGIN + 10;
-    int debugY = (int) MARGIN + 20;
-    public final double[][] corners =
-        {{MARGIN, MARGIN},                    // top-left
-            {WIDTH - MARGIN, MARGIN},             // top-right
-            {WIDTH - MARGIN, HEIGHT - MARGIN},    // bottom-right
-            {MARGIN, HEIGHT - MARGIN}};           // bottom-left
+public class Field extends BaseRenderObject {
+    public final double MARGIN;
+    public final double[][] corners;
+    public final ArrayList<BaseRenderObject> fieldElements = new ArrayList<>();
 
-    public final Line[] walls = {
-        new Line(new Point(corners[0][0], corners[0][1]), new Point(corners[1][0], corners[1][1])), // top wall
-        new Line(new Point(corners[1][0], corners[1][1]), new Point(corners[2][0], corners[2][1])), // right wall
-        new Line(new Point(corners[2][0], corners[2][1]), new Point(corners[3][0], corners[3][1])), // bottom wall
-        new Line(new Point(corners[3][0], corners[3][1]), new Point(corners[0][0], corners[0][1]))  // left wall
-    };
+    public final Line[] walls;
 
-    public PurePursuit pp;
-    public final Chassis chassis;
+    public Field(double width, double height, double margin) {
+        this.WIDTH = inchesToPixels(width);
+        this.HEIGHT = inchesToPixels(height);
+        this.MARGIN = inchesToPixels(margin);
+        pose = new Pose(0, 0, 0);
+        corners = new double[][]
+                {{MARGIN, MARGIN},
+                {WIDTH - MARGIN, MARGIN},
+                {WIDTH - MARGIN, HEIGHT - MARGIN},
+                {MARGIN, HEIGHT - MARGIN}};
+        walls = new Line[] {
+                new Line(new huasked.hubosim.util.Point(corners[0][0], corners[0][1]), new huasked.hubosim.util.Point(corners[1][0], corners[1][1])), // top wall
+                new Line(new huasked.hubosim.util.Point(corners[1][0], corners[1][1]), new huasked.hubosim.util.Point(corners[2][0], corners[2][1])), // right wall
+                new Line(new huasked.hubosim.util.Point(corners[2][0], corners[2][1]), new huasked.hubosim.util.Point(corners[3][0], corners[3][1])), // bottom wall
+                new Line(new huasked.hubosim.util.Point(corners[3][0], corners[3][1]), new Point(corners[0][0], corners[0][1]))  // left wall
+        };
 
-    public Field(Chassis chassis, PurePursuit pp) {
-        this.chassis = chassis;
-        this.pp = pp;
+        this.setPreferredSize(new Dimension((int) this.WIDTH, (int) this.HEIGHT));
+    }
+
+    public void addElement(BaseRenderObject e) { fieldElements.add(e); }
+
+    @Override
+    public void update() {
+        repaint();
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public void render(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
         Rectangle2D rect = new Rectangle2D.Double(0, 0, WIDTH, HEIGHT);
         g2d.fill(rect);
         drawField(g);
-//        drawPath(g, huasked.hubosim.Main.chosenPath, Color.CYAN);
-//        drawPath(g, pp.actualPath, Color.GREEN);
-//        drawLookaheadCircle(g, pp.lookaheadDistance);
-//        huasked.hubosim.Main.lidar.drawSensorLines(g);
-//        huasked.hubosim.Main.mcl.drawParticles(g, 6);
-        chassis.render(g);
     }
 
-    public void drawPath(Graphics g, ArrayList<Map.Entry<Point, Double>> path, Color color) {
-        if (path == null || path.isEmpty()) {
-            return;
-        }
-
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(color);
-        g2d.setStroke(new BasicStroke(2.0f));
-        for (int i = 0; i < path.size() - 1; i++) {
-            Point start = path.get(i).getKey();
-            Point end = path.get(i + 1).getKey();
-            Line2D line = new Line2D.Double(
-                SimMath.inchesToPixels(start.x) + WIDTH / 2,
-                SimMath.inchesToPixels(-start.y) + HEIGHT / 2,
-                SimMath.inchesToPixels(end.x) + WIDTH / 2,
-                SimMath.inchesToPixels(-end.y) + HEIGHT / 2
-            );
-            g2d.draw(line);
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        this.render(g);
+        for (BaseRenderObject obj : fieldElements) {
+            obj.render(g);
         }
     }
 
-    public void updateField() {
-        constrainChassis();
-        chassis.update();
-        repaint();
-    }
-
-    private void constrainChassis() {
-        Pose pose = chassis.pose;
-        double halfWidth = SimMath.pixelsToInches(chassis.width) / 2;
-        double halfLength = SimMath.pixelsToInches(chassis.length) / 2;
-        if (pose.x - halfWidth < -70) {
-            pose.x = -70 + halfWidth;
-        }
-        else if (pose.x + halfWidth > 70) {
-            pose.x = 70 - halfWidth;
-        }
-
-        if (pose.y - halfLength < -70) {
-            pose.y = -70 + halfLength;
-        }
-        else if (pose.y + halfLength > 70) {
-            pose.y = 70 - halfLength;
-        }
-
-    }
-
-    public void drawField(Graphics g) {
+    private void drawField(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(4.0f));
-
         for (Line line : walls) {
             Line2D nLine = new Line2D.Double(line.start.x, line.start.y, line.end.x, line.end.y);
             g2d.draw(nLine);
         }
-        Pose robPose = SimMath.cartesianToPixels(chassis.pose);
-        double robotX = inchesToScreenX(chassis.pose.x);
-        double robotY = inchesToScreenY(chassis.pose.y);
-        double robotDotRadius = 8;
-        g2d.setColor(Color.BLUE);
-        g2d.fillOval(
-            (int) (robotX - robotDotRadius),
-            (int) (robotY - robotDotRadius),
-            (int) (robotDotRadius * 2),
-            (int) (robotDotRadius * 2)
-        );
-        Point target = pp.targetPoint;
-        g2d.drawString(
-            String.format("Target: (%.2f, %.2f)", target.x, target.y),
-            debugX, debugY
-        );
-        g2d.drawString(
-            String.format("Pose: (%.2f, %.2f, %.2f)", chassis.pose.x, chassis.pose.y, chassis.pose.heading * 180 / Math.PI),
-            debugX, debugY + 20);
-        g2d.drawString(
-            String.format("Relative Heading: %.2f . Abs Heading: %.2f", pp.rHeading, pp.aHeading),
-            debugX, debugY + 40);
-        g2d.drawString(
-            String.format("Segment: %d . Scalar: %.2f . Progress: %.2f%%", pp.pathSegIndex, pp.pathSegmentScalarProgression, pp.pathFollowPercentage),
-            debugX, debugY + 60);
-        g2d.drawString(
-            String.format("Front Left: %.2f | Front Right: %.2f", chassis.modules[0].velocity.magnitude, chassis.modules[1].velocity.magnitude),
-            debugX, debugY + 80
-        );
-        g2d.drawString(
-            String.format("Back Left: %.2f | Back Right: %.2f", chassis.modules[2].velocity.magnitude, chassis.modules[3].velocity.magnitude),
-            debugX, debugY + 100
-        );
-    }
-
-    public void drawLookaheadCircle(Graphics g, double lookaheadDistance) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(new Color(0, 180, 255, 120)); // Light blue with transparency
-        g2d.setStroke(new BasicStroke(1.5f));
-
-        // Convert lookahead distance from inches to pixels
-        double radiusPixels = SimMath.inchesToPixels(lookaheadDistance);
-
-        // Center the circle on the robot's position
-        Pose center = SimMath.cartesianToPixels(chassis.pose);
-        double centerX = center.x;
-        double centerY = center.y;
-
-        // Draw the circle
-        g2d.drawOval(
-            (int) (centerX - radiusPixels),
-            (int) (centerY - radiusPixels),
-            (int) (radiusPixels * 2),
-            (int) (radiusPixels * 2)
-        );
-    }
-
-    public double inchesToScreenX(double inches) {
-        return SimMath.inchesToPixels(inches) + WIDTH / 2;
-    }
-
-    public double inchesToScreenY(double inches) {
-        return HEIGHT / 2 - SimMath.inchesToPixels(inches);
     }
 }

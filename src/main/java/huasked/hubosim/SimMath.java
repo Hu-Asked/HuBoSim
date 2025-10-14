@@ -7,25 +7,8 @@ import huasked.hubosim.util.Pose;
 import java.util.Random;
 
 public class SimMath {
-    private static final double fieldSize = Main.FIELD_SIZE;
-    private static final double baseSize = 140;
     public static Random rd = new Random();
 
-    public static double inchesToPixels(double inches) {
-        return fieldSize / baseSize * inches;
-    }
-
-    public static double pixelsToInches(double pixels) {
-        return pixels * baseSize / fieldSize;
-    }
-
-    public static Pose pixelsToCartesian(Pose pose) {
-        return new Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading);
-    }
-
-    public static Pose cartesianToPixels(Pose pose) {
-        return new Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading);
-    }
 
     public static Point getLineIntersection(Line line1, Line line2) {
         double x1 = line1.start.x, y1 = line1.start.y;
