@@ -23,5 +23,5 @@ public abstract class BaseRenderObject extends JPanel {
 
     protected static Pose cartesianToPixels(Pose pose) { return new Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading); }
 
-    public void debugInfo(int x, int y) { }
+    public void debugInfo(Graphics g, int x, int y) { }
 }

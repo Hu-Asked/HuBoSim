@@ -19,11 +19,11 @@ public class Main {
 //    public static ControllerController controller = new ControllerController();
 
     public static void main(String[] args) {
-//        SwerveModule l1, l2, r1, r2;
-//        l1 = new SwerveModule(2, 2);
-//        l2 = new SwerveModule(2, 2);
-//        r1 = new SwerveModule(2, 2);
-//        r2 = new SwerveModule(2, 2);
+        SwerveModule l1, l2, r1, r2;
+        l1 = new SwerveModule(2, 2);
+        l2 = new SwerveModule(2, 2);
+        r1 = new SwerveModule(2, 2);
+        r2 = new SwerveModule(2, 2);
 //        Chassis chassis = new Chassis(12, 12, 3.5, new Pose(0, 0, 0));
 //        chassis.addSwerveModules(l1, r1, l2, r2);
 //        PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
@@ -32,8 +32,12 @@ public class Main {
 //        pp.currentPose = chassis.pose;
 //        pp.initializePath(pp.getStrippedPath(chosenPath));
         Field field = new Field(140, 140, 3);
+        Chassis chassis = new Chassis(0, 0, 10, 12);
+        chassis.addSwerveModules(l1, l2, r1, r2);
+        ControllerController controller = new ControllerController();
+        field.addElement(chassis);
         setFrame(field);
-//        controller.init();
+        controller.init();
         try {
             while (!start) {
                 Thread.sleep(1000);
@@ -43,7 +47,8 @@ public class Main {
             return;
         }
         while (true) {
-//            controller.pollController();
+            controller.pollController();
+            chassis.updateDrive(controller.leftStickX, controller.leftStickY, controller.rightStickX, controller.rightStickY);
 //            for (Lidar.Direction dir : Lidar.Direction.values()) {
 //                int i = dir.ordinal();
 //                expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);

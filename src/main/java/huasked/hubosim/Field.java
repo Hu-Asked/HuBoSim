@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Field extends BaseRenderObject {
     public final double MARGIN;
     public final double[][] corners;
-    public final ArrayList<BaseRenderObject> fieldElements = new ArrayList<>();
+    private final ArrayList<BaseRenderObject> fieldElements = new ArrayList<>();
 
     public final Line[] walls;
 
@@ -41,6 +41,9 @@ public class Field extends BaseRenderObject {
 
     @Override
     public void update() {
+        for (BaseRenderObject e : fieldElements) {
+            e.update();
+        }
         repaint();
     }
 
@@ -57,8 +60,12 @@ public class Field extends BaseRenderObject {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.render(g);
+        int debugX = (int) MARGIN + 10;
+        int debugY = (int) MARGIN + 20;
         for (BaseRenderObject obj : fieldElements) {
             obj.render(g);
+            obj.debugInfo(g, debugX, debugY);
+            debugY += 20;
         }
     }
 
