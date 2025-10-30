@@ -1,9 +1,5 @@
 package huasked.hubosim.control;
 
-import huasked.hubosim.Main;
-import huasked.hubosim.SimMath;
-
-import java.awt.event.KeyEvent;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 

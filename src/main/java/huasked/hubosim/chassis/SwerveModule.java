@@ -1,12 +1,16 @@
-package huasked.hubosim;
+package huasked.hubosim.chassis;
 
-import huasked.hubosim.util.Pose;
-import huasked.hubosim.util.VelocityVector;
-
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+
+import huasked.hubosim.BaseRenderObject;
+import huasked.hubosim.util.Pose;
+import huasked.hubosim.util.VelocityVector;
 
 public class SwerveModule extends BaseRenderObject {
     public VelocityVector velocity = new VelocityVector(0, 0);
