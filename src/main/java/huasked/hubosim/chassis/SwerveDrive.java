@@ -8,7 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
-import huasked.hubosim.MathPP;
+import huasked.hubosim.algorithm.MathPP;
 import huasked.hubosim.util.Pose;
 import huasked.hubosim.util.VelocityVector;
 

@@ -1,14 +1,17 @@
 package huasked.hubosim;
 
-import huasked.hubosim.util.Line;
-import huasked.hubosim.util.Point;
-import huasked.hubosim.util.Pose;
-import jdk.dynalink.linker.support.CompositeTypeBasedGuardingDynamicLinker;
-
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+
+import huasked.hubosim.util.Line;
+import huasked.hubosim.util.Point;
+import huasked.hubosim.util.Pose;
 
 public class Field extends BaseRenderObject {
     public final double MARGIN;
@@ -53,6 +56,8 @@ public class Field extends BaseRenderObject {
         g2d.setColor(Color.WHITE);
         Rectangle2D rect = new Rectangle2D.Double(0, 0, WIDTH, HEIGHT);
         g2d.fill(rect);
+        PPPaths.renderPath(g, PPPaths.activePath, Color.CYAN, this.WIDTH, this.HEIGHT);
+        PPPaths.renderPath(g, Main.pp.actualPath, Color.GREEN, this.WIDTH, this.HEIGHT);
         drawField(g);
     }
 

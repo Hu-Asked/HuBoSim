@@ -1,4 +1,4 @@
-package huasked.hubosim;
+package huasked.hubosim.algorithm;
 
 import huasked.hubosim.util.Line;
 import huasked.hubosim.util.Point;

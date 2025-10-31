@@ -1,44 +1,43 @@
 package huasked.hubosim;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import javax.swing.JFrame;
 
-import huasked.hubosim.chassis.SwerveDrive;
-import huasked.hubosim.chassis.SwerveModule;
+import huasked.hubosim.algorithm.PurePursuit;
 import huasked.hubosim.chassis.TankDrive;
 import huasked.hubosim.control.KeyboardController;
-import huasked.hubosim.util.Point;
 
 public class Main {
-    public static ArrayList<Map.Entry<Point, Double>> chosenPath = PPPaths.samplePath;
     public static boolean start = false;
     public static double[] expectedDist = {-1, -1, -1, -1};
     public static JFrame frame = new JFrame("HuBoSim");
     public static KeyboardController keyboard = new KeyboardController();
-//    public static ControllerController controller = new ControllerController();
+    public static PurePursuit pp;
+    // public static ControllerController controller = new ControllerController();
 
     public static void main(String[] args) {
+        Field field = new Field(140, 140, 3);
+        /*   SWERVE CONFIGURATION
         SwerveModule l1, l2, r1, r2;
         l1 = new SwerveModule(2, 2);
         l2 = new SwerveModule(2, 2);
         r1 = new SwerveModule(2, 2);
         r2 = new SwerveModule(2, 2);
-//        SwerveDrive chassis = new SwerveDrive(12, 12, 3.5, new Pose(0, 0, 0));
-//        chassis.addSwerveModules(l1, r1, l2, r2);
-//        PurePursuit pp = new PurePursuit(chassis, 1, 0.002, 10);
-//        chassis.pose.x = chosenPath.getFirst().getKey().x;
-//        chassis.pose.y = chosenPath.getFirst().getKey().y;
-//        pp.currentPose = chassis.pose;
-//        pp.initializePath(pp.getStrippedPath(chosenPath));
-        Field field = new Field(140, 140, 3);
+        SwerveDrive chassis = new SwerveDrive(12, 12, 3.5, new Pose(0, 0, 0));
         SwerveModule[] modules = {l1, l2, r1, r2};
-        // SwerveDrive chassis = new SwerveDrive(0, 0, 10, 12, modules);
+        chassis.addSwerveModules(l1, r1, l2, r2);
+        SwerveDrive chassis = new SwerveDrive(0, 0, 10, 12, modules);
+        */
+        PPPaths.init();
+        PPPaths.setActive("elims");
         TankDrive chassis = new TankDrive(0, 0, 10, 12, 1.5);
-        // ControllerController controller = new ControllerController();
+        pp = new PurePursuit(chassis, 1, 0.002, 10);
+        chassis.pose.x = PPPaths.activePath.get(0).point.x;
+        chassis.pose.y = PPPaths.activePath.get(0).point.y;
+        pp.currentPose = chassis.pose;
+        pp.initializePath(pp.getStrippedPath(PPPaths.activePath));
         field.addElement(chassis);
         setFrame(field);
+        // ControllerController controller = new ControllerController();
         // controller.init();
         try {
             while (!start) {
@@ -51,29 +50,17 @@ public class Main {
         while (true) {
             // controller.pollController();
             // chassis.updateDrive(controller.leftStickX, controller.leftStickY, controller.rightStickX, controller.rightStickY);
-            // chassis.updateDrive(keyboard.leftX, keyboard.leftY, keyboard.rightX, 0);
             chassis.updateDrive(keyboard.leftX, keyboard.leftY);
-//            for (Lidar.Direction dir : Lidar.Direction.values()) {
-//                int i = dir.ordinal();
-//                expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);
-//            }
-//            lidar.updateSensorLines();
-//            mcl.update();
-//            chassis.updateDrive(controller.leftStickX, controller.leftStickY, controller.rightStickX, controller.rightStickY);
-//            pp.currentPose = chassis.pose;
-//            if(!pp.exit) pp.followPath(chosenPath, 10, 1, 4);
-//            pp.waitUntil(60);
-//            if(pp.release) {
-//                chosenPath = PPPaths.samplePath1;
-//                pp.initializePath(pp.getStrippedPath(chosenPath));
-//            }
+            pp.followPath(PPPaths.activePath, 10, 1, 1);
+            // for (Lidar.Direction dir : Lidar.Direction.values()) {
+            //     int i = dir.ordinal();
+            //     expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);
+            // }
+            // lidar.updateSensorLines();
+            // mcl.update();
+            pp.currentPose = chassis.pose;
             field.update();
-            try {
-                Thread.sleep(16);
-            }
-            catch (InterruptedException e) {
-                return;
-            }
+            tick();
         }
     }
 
@@ -86,5 +73,13 @@ public class Main {
         frame.requestFocusInWindow();
         frame.setVisible(true);
         frame.setResizable(true);
+    }
+    static void tick() {
+            try {
+                Thread.sleep(16);
+            }
+            catch (InterruptedException e) {
+                return;
+            }
     }
 }

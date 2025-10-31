@@ -1,13 +1,18 @@
-//package huasked.hubosim;
+// package huasked.hubosim.algorithm;
 //
-//import huasked.hubosim.util.Line;
-//import huasked.hubosim.util.Point;
-//import huasked.hubosim.util.Pose;
+// import java.awt.Color;
+// import java.awt.Graphics;
+// import java.util.Arrays;
 //
-//import java.awt.*;
-//import java.util.Arrays;
+// import huasked.hubosim.BaseRenderObject;
+// import huasked.hubosim.Main;
+// import huasked.hubosim.SimMath;
+// import huasked.hubosim.chassis.TankDrive;
+// import huasked.hubosim.util.Line;
+// import huasked.hubosim.util.Point;
+// import huasked.hubosim.util.Pose;
 //
-//public class Lidar {
+// public class Lidar extends BaseRenderObject{
 //    enum Direction {
 //        FRONT,
 //        RIGHT,
@@ -15,13 +20,13 @@
 //        LEFT
 //    }
 //
-//    Chassis chassis;
+//    TankDrive chassis;
 //    double maxRange;
 //    Line[] sensors = new Line[4];
 //    double[] distFromWall = new double[4]; // front, right, back, left
 //    int[] detectedWall = {-1, -1, -1, -1};
 //
-//    public Lidar(double maxRange, Chassis chassis) {
+//    public Lidar(double maxRange, TankDrive chassis) {
 //        this.maxRange = maxRange;
 //        this.chassis = chassis;
 //        updateSensorLines();
@@ -35,11 +40,11 @@
 //    }
 //
 //    public void updateSensorLines() {
-//        Pose pose = SimMath.cartesianToPixels(this.chassis.pose);
+//        Pose pose =cartesianToPixels(this.chassis.pose);
 //        double x = pose.x;
 //        double y = pose.y;
 //        double angle = pose.heading;
-//        double length = SimMath.inchesToPixels(maxRange);
+//        double length = inchesToPixels(maxRange);
 //        sensors[Direction.FRONT.ordinal()] = new Line(new Point(x, y), new Point(x + length * Math.cos(angle - Math.PI / 2), y + length * Math.sin(angle - Math.PI / 2)));
 //        sensors[Direction.RIGHT.ordinal()] = new Line(new Point(x, y), new Point(x + length * Math.cos(angle), y + length * Math.sin(angle)));
 //        sensors[Direction.BACK.ordinal()] = new Line(new Point(x, y), new Point(x + length * Math.cos(angle + Math.PI / 2), y + length * Math.sin(angle + Math.PI / 2)));
@@ -57,8 +62,8 @@
 //                    double dx = intersection.x - sensor.start.x;
 //                    double dy = intersection.y - sensor.start.y;
 //                    double distance = Math.hypot(dx, dy);
-//                    if (distance < SimMath.inchesToPixels(maxRange)) {
-//                        distFromWall[dir.ordinal()] = SimMath.pixelsToInches(distance) + SimMath.getGaussianError(1.0);
+//                    if (distance < inchesToPixels(maxRange)) {
+//                        distFromWall[dir.ordinal()] = pixelsToInches(distance) + SimMath.getGaussianError(1.0);
 //                        detectedWall[dir.ordinal()] = Arrays.asList(walls).indexOf(wall);
 //                        foundIntersection[dir.ordinal()] = true;
 //                    }
@@ -70,4 +75,4 @@
 //            }
 //        }
 //    }
-//}
+// }

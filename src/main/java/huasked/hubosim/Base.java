@@ -6,9 +6,12 @@ import huasked.hubosim.util.Pose;
 
 import java.util.Random;
 
-public class SimMath {
+import javax.swing.JPanel;
+
+public class Base extends JPanel {
     public static Random rd = new Random();
 
+    protected static final double inchesToPixelsRatio = 140.0/880.0;
 
     public static Point getLineIntersection(Line line1, Line line2) {
         double x1 = line1.start.x, y1 = line1.start.y;
@@ -38,5 +41,13 @@ public class SimMath {
     public static double getGaussianError(double errorMarginPct) {
         return rd.nextGaussian() * (errorMarginPct / 100.0);
     }
+
+    protected static double inchesToPixels(double inches) { return inches / inchesToPixelsRatio; }
+
+    protected static double pixelsToInches(double pixels) { return pixels * inchesToPixelsRatio; }
+
+    protected static Pose pixelsToCartesian(Pose pose) { return new Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading); }
+
+    protected static Pose cartesianToPixels(Pose pose) { return new Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading); }
 
 }
