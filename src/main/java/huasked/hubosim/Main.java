@@ -16,6 +16,7 @@ public class Main {
 
     public static void main(String[] args) {
         Field field = new Field(140, 140, 3);
+        FieldElements elements = new FieldElements();
         /*   SWERVE CONFIGURATION
         SwerveModule l1, l2, r1, r2;
         l1 = new SwerveModule(2, 2);
@@ -36,6 +37,7 @@ public class Main {
         pp.currentPose = chassis.pose;
         pp.initializePath(pp.getStrippedPath(PPPaths.activePath));
         field.addElement(chassis);
+        field.addElement(elements);
         setFrame(field);
         // ControllerController controller = new ControllerController();
         // controller.init();
@@ -51,7 +53,7 @@ public class Main {
             // controller.pollController();
             // chassis.updateDrive(controller.leftStickX, controller.leftStickY, controller.rightStickX, controller.rightStickY);
             chassis.updateDrive(keyboard.leftX, keyboard.leftY);
-            pp.followPath(PPPaths.activePath, 10, 1, 1);
+            pp.followPath(PPPaths.activePath, 14, 0.8, 1);
             // for (Lidar.Direction dir : Lidar.Direction.values()) {
             //     int i = dir.ordinal();
             //     expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);

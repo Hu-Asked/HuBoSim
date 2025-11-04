@@ -48,6 +48,6 @@ public class Base extends JPanel {
 
     protected static Pose pixelsToCartesian(Pose pose) { return new Pose(pixelsToInches(pose.x) - 70, -pixelsToInches(pose.y) + 70, pose.heading); }
 
-    protected static Pose cartesianToPixels(Pose pose) { return new Pose(inchesToPixels(pose.x + 70), -inchesToPixels(pose.y - 70), pose.heading); }
+    protected static Pose cartesianToPixels(Pose pose) { return new Pose(inchesToPixels(pose.x + 70 + 3), -inchesToPixels(pose.y - 70 + 3), pose.heading); }
 
 }
