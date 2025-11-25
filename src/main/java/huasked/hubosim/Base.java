@@ -41,6 +41,10 @@ public class Base extends JPanel {
     public static double getGaussianError(double errorMarginPct) {
         return rd.nextGaussian() * (errorMarginPct / 100.0);
     }
+    
+    protected static double toRad(double deg) { return deg * Math.PI/180; }
+
+    protected static double toDeg(double rad) { return rad * 180/Math.PI; }
 
     protected static double inchesToPixels(double inches) { return inches / inchesToPixelsRatio; }
 

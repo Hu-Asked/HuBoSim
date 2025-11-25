@@ -1,7 +1,6 @@
 package huasked.hubosim.chassis;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -31,8 +30,7 @@ public class Chassis extends BaseRenderObject {
     }
 
     @Override
-    public void render(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    public void render(Graphics2D g2d) {
 
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(3.5f));

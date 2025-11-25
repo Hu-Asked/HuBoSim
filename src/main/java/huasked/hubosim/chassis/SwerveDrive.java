@@ -2,7 +2,6 @@ package huasked.hubosim.chassis;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
@@ -20,8 +19,7 @@ public class SwerveDrive extends Chassis {
     }
 
     @Override
-    public void render(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    public void render(Graphics2D g2d) {
 
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(3.5f));
@@ -49,7 +47,7 @@ public class SwerveDrive extends Chassis {
             if (module == null) {
                 continue;
             }
-            module.render(g);
+            module.render(g2d);
         }
         g2d.setTransform(old);
     }
@@ -154,7 +152,7 @@ public class SwerveDrive extends Chassis {
         double W = pixelsToInches(this.WIDTH);
         double R = Math.hypot(L, W);
         double targetHeading = this.pose.heading;
-        if (Math.sqrt(rightY * rightY + rightX * rightX) > 0.5) {
+        if (Math.hypot(rightY, rightX) > 0.5) {
             targetHeading = -(Math.atan2(rightY, rightX) - Math.PI / 2);
         }
         double delta = MathPP.angleWrap(targetHeading - MathPP.angleWrap(this.pose.heading, true), true);

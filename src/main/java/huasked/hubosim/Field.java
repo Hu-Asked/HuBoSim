@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -51,31 +52,32 @@ public class Field extends BaseRenderObject {
     }
 
     @Override
-    public void render(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    public void render(Graphics2D g2d) {
         g2d.setColor(Color.WHITE);
         Rectangle2D rect = new Rectangle2D.Double(0, 0, WIDTH, HEIGHT);
         g2d.fill(rect);
-        PPPaths.renderPath(g, PPPaths.activePath, Color.CYAN, this.WIDTH, this.HEIGHT);
-        PPPaths.renderPath(g, Main.pp.actualPath, Color.GREEN, this.WIDTH, this.HEIGHT);
-        drawField(g);
+        // PPPaths.renderPath(g, PPPaths.activePath, Color.CYAN, this.WIDTH, this.HEIGHT);
+        // PPPaths.renderPath(g, Main.pp.actualPath, Color.GREEN, this.WIDTH, this.HEIGHT);
+        drawField(g2d);
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.render(g);
+        this.render((Graphics2D) g);
         int debugX = (int) MARGIN + 10;
         int debugY = (int) MARGIN + 20;
+        Graphics2D g2d = (Graphics2D) g;
         for (BaseRenderObject obj : fieldElements) {
-            obj.render(g);
+            AffineTransform old = g2d.getTransform();
+            obj.render(g2d);
             obj.debugInfo(g, debugX, debugY);
             debugY += 20;
+            g2d.setTransform(old);
         }
     }
 
-    private void drawField(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    private void drawField(Graphics2D g2d) {
         g2d.setColor(Color.BLACK);
         g2d.setStroke(new BasicStroke(4.0f));
         for (Line line : walls) {

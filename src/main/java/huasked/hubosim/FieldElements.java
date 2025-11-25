@@ -2,7 +2,6 @@ package huasked.hubosim;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
@@ -26,8 +25,7 @@ public class FieldElements extends BaseRenderObject {
     }
 
     @Override
-    public void render(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    public void render(Graphics2D g2d) {
         g2d.setStroke(new BasicStroke(3.0f));
         g2d.setColor(Color.BLACK);
         for(Rectangle2D element : elements) {

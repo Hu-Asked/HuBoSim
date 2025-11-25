@@ -1,8 +1,9 @@
 package huasked.hubosim;
 
-import huasked.hubosim.util.Pose;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
-import java.awt.*;
+import huasked.hubosim.util.Pose;
 
 public abstract class BaseRenderObject extends Base {
     public Pose pose;
@@ -11,7 +12,7 @@ public abstract class BaseRenderObject extends Base {
 
     public void update() {}
 
-    public void render(Graphics g) {}
+    public void render(Graphics2D g2d) {}
 
 
     public void debugInfo(Graphics g, int x, int y) { }
