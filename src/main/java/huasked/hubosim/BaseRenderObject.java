@@ -14,6 +14,5 @@ public abstract class BaseRenderObject extends Base {
 
     public void render(Graphics2D g2d) {}
 
-
     public void debugInfo(Graphics g, int x, int y) { }
 }

@@ -27,6 +27,10 @@ public class Chassis extends BaseRenderObject {
         this.pose.y += latVelocity.getYComponent();
         this.pose.heading += angVelocity.magnitude;
         pose.heading %= 2 * Math.PI;
+        if(isOutOfBounds(this.pose)) {
+            this.pose.x = 0;
+            this.pose.y = 0;
+        }
     }
 
     @Override
@@ -55,6 +59,10 @@ public class Chassis extends BaseRenderObject {
         Line2D headingLine = new Line2D.Double(lineX1, lineY1, lineX2, lineY2);
         g2d.draw(headingLine);
         g2d.setTransform(old);
+    }
+
+    private boolean isOutOfBounds(Pose p) {
+        return !(p.x > -67 && p.x < 67 && p.y > -67 && p.y < 67);
     }
 
     protected void updateChassisVelocity() {}

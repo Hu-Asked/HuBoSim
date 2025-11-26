@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 
 import huasked.hubosim.algorithm.Boomerang;
 import huasked.hubosim.algorithm.Lidar;
+import huasked.hubosim.algorithm.MCL;
 import huasked.hubosim.algorithm.PurePursuit;
 import huasked.hubosim.chassis.TankDrive;
 import huasked.hubosim.control.KeyboardController;
@@ -46,12 +47,14 @@ public class Main {
         // chassis.pose.y = PPPaths.activePath.get(0).point.y;
         //
         Lidar lidar = new Lidar(50, chassis);
+        MCL mcl = new MCL(500, 10, -3, -3, lidar, chassis);
         
         field.addElement(lidar);
         field.addElement(chassis);
         field.addElement(mouse);
         field.addElement(elements);
         field.addElement(boom);
+        field.addElement(mcl);
         setFrame(field);
         // controller.init();
         try {

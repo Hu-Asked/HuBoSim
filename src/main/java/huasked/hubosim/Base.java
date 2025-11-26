@@ -1,12 +1,12 @@
 package huasked.hubosim;
 
-import huasked.hubosim.util.Line;
-import huasked.hubosim.util.Point;
-import huasked.hubosim.util.Pose;
-
 import java.util.Random;
 
 import javax.swing.JPanel;
+
+import huasked.hubosim.util.Line;
+import huasked.hubosim.util.Point;
+import huasked.hubosim.util.Pose;
 
 public class Base extends JPanel {
     public static Random rd = new Random();

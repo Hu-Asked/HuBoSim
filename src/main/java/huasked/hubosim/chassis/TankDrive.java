@@ -31,6 +31,10 @@ public class TankDrive extends Chassis {
         this.rightVelocity = vel;
     }
 
+    public boolean isReversing() {
+        return (leftVelocity < 0 || rightVelocity < 0);
+    }
+
     @Override
     public void debugInfo(Graphics g, int x, int y) {
         String output = String.format("%.2f, %.2f, %.2f", this.pose.x, this.pose.y, this.pose.heading);
