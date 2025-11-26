@@ -15,16 +15,14 @@ import huasked.hubosim.util.Point;
 import huasked.hubosim.util.Pose;
 
 public class Field extends BaseRenderObject {
-    public final double MARGIN;
     public final double[][] corners;
     private final ArrayList<BaseRenderObject> fieldElements = new ArrayList<>();
 
     public final Line[] walls;
 
-    public Field(double width, double height, double margin) {
+    public Field(double width, double height) {
         this.WIDTH = inchesToPixels(width);
         this.HEIGHT = inchesToPixels(height);
-        this.MARGIN = inchesToPixels(margin);
         pose = new Pose(0, 0, 0);
         corners = new double[][]
                 {{MARGIN, MARGIN},

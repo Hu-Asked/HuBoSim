@@ -20,7 +20,7 @@ public class FieldElements extends BaseRenderObject {
     public void addElement(int x, int y, int width, int height) {
         Pose pos = new Pose(x-width/2, y-height/2, 0);
         pos = cartesianToPixels(pos);
-        Rectangle2D rect = new Rectangle((int) pos.x, (int) pos.y, (int) inchesToPixels(width), (int) inchesToPixels(height));
+        Rectangle2D rect = new Rectangle((int) pos.x, (int) (pos.y - MARGIN), (int) inchesToPixels(width), (int) inchesToPixels(height));
         elements.add(rect);
     }
 

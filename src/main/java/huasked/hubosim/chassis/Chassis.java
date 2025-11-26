@@ -6,6 +6,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.plaf.basic.BasicBorders.MarginBorder;
+
 import huasked.hubosim.BaseRenderObject;
 import huasked.hubosim.util.Pose;
 import huasked.hubosim.util.VelocityVector;
@@ -41,7 +43,7 @@ public class Chassis extends BaseRenderObject {
 
         Pose newPose = cartesianToPixels(pose);
         double x = newPose.x;
-        double y = newPose.y;
+        double y = newPose.y + MARGIN;
 
         AffineTransform old = g2d.getTransform();
 

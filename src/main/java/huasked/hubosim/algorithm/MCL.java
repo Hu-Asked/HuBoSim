@@ -58,7 +58,7 @@ public class MCL extends BaseRenderObject {
 
     @Override
     public void render(Graphics2D g2d) {
-        drawParticles(g2d, 4);
+        drawParticles(g2d, 10);
     }
 
     @Override
@@ -84,8 +84,8 @@ public class MCL extends BaseRenderObject {
         for (Pose p : particles) {
             Pose pixelPose = cartesianToPixels(p);
             g.setColor(Color.BLUE);
-            int px = (int) pixelPose.x;
-            int py = (int) pixelPose.y;
+            int px = (int) (pixelPose.x - MARGIN);
+            int py = (int) (pixelPose.y + MARGIN);
             int newRadius = radius;
             //          int newRadius = (int) (radius * (weighParticle(p) / (totalWeight / numParticles)));
             //          if (newRadius < 2) newRadius = 2;
@@ -145,16 +145,10 @@ public class MCL extends BaseRenderObject {
 
     }
 
-    private boolean isOutOfBounds(Pose p) {
-        return !(p.x > -67 && p.x < 67 && p.y > -67 && p.y < 67);
-    }
-
-    public double getParticleReading(Pose p, Lidar.Direction sensorDir) {
-        double sensorHeading = MathPP.angleWrap(p.heading + sensorDir.ordinal() * Math.PI / 2, true);
+    private double getExpectedReading(Pose p, Lidar.Direction sensorDir) {
+     double sensorHeading = MathPP.angleWrap(p.heading + sensorDir.ordinal() * Math.PI / 2, true);
         int wall = lidar.detectedWall[sensorDir.ordinal()];
-        if (wall == -1) {
-            return -1;
-        }
+        if (wall == -1) return -1;
         double relativeHeading = 0;
         double offsetFromWall = 0;
         switch (wall) {
@@ -164,7 +158,7 @@ public class MCL extends BaseRenderObject {
             }
             case 1 -> {
                 offsetFromWall = 70 - p.x;
-                relativeHeading = MathPP.angleWrap(Math.PI / 2 - sensorHeading, true);
+                relativeHeading = MathPP.angleWrap(Math.PI/2 - sensorHeading, true);
             }
             case 2 -> {
                 offsetFromWall = 70 + p.y;
@@ -172,17 +166,20 @@ public class MCL extends BaseRenderObject {
             }
             case 3 -> {
                 offsetFromWall = 70 + p.x;
-                relativeHeading = MathPP.angleWrap(3 * Math.PI / 2 - sensorHeading, true);
+                relativeHeading = MathPP.angleWrap(3*Math.PI/2 - sensorHeading, true);
             }
         }
         double res = offsetFromWall + relativeHeading;
         if (sensorDir == Lidar.Direction.FRONT || sensorDir == Lidar.Direction.BACK) {
             res += expectedReadingOffsetLat;
-        }
-        else {
+        } else {
             res += expectedReadingOffsetSides;
         }
         return res;
+    }
+
+    private boolean isOutOfBounds(Pose p) {
+        return !(p.x > -67 && p.x < 67 && p.y > -67 && p.y < 67);
     }
 
     private void resampleParticles() {

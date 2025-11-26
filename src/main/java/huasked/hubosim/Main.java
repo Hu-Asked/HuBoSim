@@ -23,7 +23,7 @@ public class Main {
     // public static ControllerController controller = new ControllerController();
 
     public static void main(String[] args) {
-        field = new Field(140, 140, 3);
+        field = new Field(140, 140);
         FieldElements elements = new FieldElements();
         /*   SWERVE CONFIGURATION */
         // SwerveModule l1, l2, r1, r2;

@@ -9,6 +9,7 @@ import huasked.hubosim.util.Point;
 import huasked.hubosim.util.Pose;
 
 public class Base extends JPanel {
+    public final double MARGIN = inchesToPixels(3);
     public static Random rd = new Random();
 
     protected static final double inchesToPixelsRatio = 140.0/880.0;
