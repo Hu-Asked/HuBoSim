@@ -3,6 +3,7 @@ package huasked.hubosim;
 import javax.swing.JFrame;
 
 import huasked.hubosim.algorithm.Boomerang;
+import huasked.hubosim.algorithm.Lidar;
 import huasked.hubosim.algorithm.PurePursuit;
 import huasked.hubosim.chassis.TankDrive;
 import huasked.hubosim.control.KeyboardController;
@@ -34,19 +35,24 @@ public class Main {
 
         PPPaths.init();
         PPPaths.setActive("elims");
-        /*TankDrive*/ chassis = new TankDrive(0, 0, 10, 12, 1.5);
-        /*Boomerang */boom = new Boomerang(0.05, 0.05, 10, chassis);
+        chassis = new TankDrive(0, 0, 10, 12, 1.5);
+        boom = new Boomerang(0.05, 0.05, 10, chassis);
+        
+        // Pure pursuit
         // pp = new PurePursuit(chassis, 1, 0.002, 10);
         // pp.currentPose = chassis.pose;
         // pp.initializePath(pp.getStrippedPath(PPPaths.activePath));
-        chassis.pose.x = PPPaths.activePath.get(0).point.x;
-        chassis.pose.y = PPPaths.activePath.get(0).point.y;
+        // chassis.pose.x = PPPaths.activePath.get(0).point.x;
+        // chassis.pose.y = PPPaths.activePath.get(0).point.y;
+        //
+        Lidar lidar = new Lidar(50, chassis);
+        
+        field.addElement(lidar);
         field.addElement(chassis);
         field.addElement(mouse);
         field.addElement(elements);
         field.addElement(boom);
         setFrame(field);
-        //         ControllerController controller = new ControllerController();
         // controller.init();
         try {
             Thread.sleep(1500);
@@ -56,13 +62,18 @@ public class Main {
         }
         System.out.println("started");
         while (true) {
+            // Swerve
             // controller.pollController();
             // chassis.updateDrive(controller.leftStickX, controller.leftStickY, controller.rightStickX, controller.rightStickY);
             // chassis.updateDrive(keyboard.leftX, keyboard.leftY, keyboard.rightX, 0);
+            // Tank
             chassis.updateDrive(keyboard.leftX, keyboard.leftY);
-            boom.pose = chassis.pose;
+
+            // Pure pursuit
             // pp.followPath(PPPaths.activePath, 14, 0.8, 1);
             // pp.currentPose = chassis.pose;
+            //
+            // MCL
             // for (Lidar.Direction dir : Lidar.Direction.values()) {
             //     int i = dir.ordinal();
             //     expectedDist[i] = mcl.getParticleReading(chassis.pose, dir);
@@ -70,11 +81,26 @@ public class Main {
             // lidar.updateSensorLines();
             // mcl.update();
             //
-            if(mouse.newPress) {
-                mouse.pose.heading = (chassis.pose.x > mouse.pose.x) ? 3 * Math.PI/2 : Math.PI/2;
-                boom.moveTo(mouse.pose, 0.7, 5); 
-                mouse.newPress = false;
-            }
+            // BOOMERANG
+            // boom.pose = chassis.pose;
+            // if(mouse.newPress) {
+            //     if(chassis.pose.x > mouse.pose.x) {
+            //         if(Math.hypot(chassis.pose.x - mouse.pose.x, chassis.pose.y - mouse.pose.y) > 40) {
+            //             mouse.pose.heading = 3 * Math.PI/2;
+            //         } else {
+            //             mouse.pose.heading = Math.PI/2;
+            //         }
+            //     } else {
+            //         if(Math.hypot(chassis.pose.x - mouse.pose.x, chassis.pose.y - mouse.pose.y) > 40) {
+            //             mouse.pose.heading = Math.PI/2;
+            //         } else {
+            //             mouse.pose.heading = 3 * Math.PI/2;
+            //         }
+            //     }
+            //     mouse.pose.heading = chassis.pose.x > mouse.pose.x ? 3 * Math.PI / 2 : Math.PI/2;
+            //     boom.moveTo(mouse.pose, 0.7, 5); 
+            //     mouse.newPress = false;
+            // }
             tick();
         }
     }
